@@ -1,7 +1,7 @@
 import asyncio
 
-from os import join, mkdir, remove
-from os.path import exists, isdir
+from os import mkdir, remove
+from os.path import exists, isdir, join
 from aiofiles import open as async_open
 
 class Binder:

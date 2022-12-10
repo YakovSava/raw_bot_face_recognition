@@ -1,6 +1,6 @@
 import asyncio
 
-from aiohttp.web import Application, RouteTableDef, HTTPInternalServerError
+from aiohttp.web import Application, RouteTableDef, HTTPInternalServerError, run_app
 from serv_plugins.storage import pages, isnull
 from serv_plugins.binder import Binder
 
@@ -37,5 +37,5 @@ async def get_open_source(request):
 		return some_page
 
 if __name__ == '__main__':
-	app.add_routes(routes)\
-	app.run()
+	app.add_routes(routes)
+	run_app(app)

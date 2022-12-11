@@ -13,4 +13,4 @@ this project was created to show projects at the [Tchaikovsky Industrial College
 1. Backend, bot, neural network - Python
 2. Site page with description of methods - HTML, CSS
 3. Drop-down menu on the site - JS, CSS
-4. Part of the neural network library - C/C++
+4. Part of the neural network library - C/C++/Cython

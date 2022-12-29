@@ -12,8 +12,6 @@ from bot_plugins.ai import recognition
 from bot_plugins.commands import command, response
 from bot_plugins.states import photo_reg
 
-warnings.filterwarnings('ignore')
-
 if platform in ['linux', 'linux2']:
 	try:
 		import uvloop
@@ -26,6 +24,8 @@ elif platform in ['win32', 'cygwin', 'msys']:
 		asyncio.set_event_loop(asyncio.WindowsSelectorEventLoopPolicy())
 	except:
 		pass
+
+warnings.filterwarnings('ignore')
 
 binder = Binder()
 bot = Bot(asyncio.run(binder.get_parameters())['token'])

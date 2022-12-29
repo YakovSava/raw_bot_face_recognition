@@ -14,7 +14,7 @@ All plugins are extremely small but require a large number of libraries:
 Some parts of the code look quite strange, you could call it a shit code, but believe me, this is done for the greatest beauty of the main file:
 
 #### binder.py:
-```Python
+```py
 class Binder:
 
 	# Our code
@@ -25,7 +25,7 @@ class Binder:
 		return eval(f'dict({lines})')
 ```
 - bot.py
-```Python
+```py
 @dp.message_handler(state = photo_reg.photo, content_type = ['photo'])
 async def recognition_second_handler(message:Message, state:FSMContext):
 	# Code
@@ -37,7 +37,7 @@ async def recognition_second_handler(message:Message, state:FSMContext):
 	)
 ```
 #### commands.py
-```Python
+```py
 class command:
 	start = ['start', 'run', 'menu']
 	recognition = ['rec', 'recognition']
@@ -51,7 +51,7 @@ class response:
 	await_user = 'Ожидайте ответа'
 ```
 - bot.py
-```Python
+```py
 @dp.message_handler(commands = command.start)
 async def start_handler(message:Message):
 	await message.answer(response.start)

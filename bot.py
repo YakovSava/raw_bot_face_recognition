@@ -7,10 +7,10 @@ from random import randint
 from aiogram import Bot, Dispatcher, executor
 from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
-from bot_plugins.binder import Binder
-from bot_plugins.ai import recognition
-from bot_plugins.commands import command, response
-from bot_plugins.states import photo_reg
+from bots_plugins.binder import Binder
+from bots_plugins.ai import recognition
+from bots_plugins.commands import command, response
+from bots_plugins.states import photo_reg
 
 if platform in ['linux', 'linux2']:
 	try:

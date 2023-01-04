@@ -65,3 +65,7 @@ class Binder:
 			file_reads = 'null'
 		finally:
 			return file_reads
+
+	async def server_get_photo(self, name:str) -> bytes:
+		async with async_open(join(self.html_file, name), 'rb') as photo:
+			return await photo.read()

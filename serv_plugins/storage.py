@@ -4,7 +4,7 @@ class pages:
 		api = '/api'
 		open_source = '/os'
 	class page:
-		main = 'main.html'
+		main = 'index.html'
 		api = 'api.html'
 		open_source = 'os.html'
 

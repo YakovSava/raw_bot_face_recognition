@@ -1,7 +1,7 @@
 import asyncio
 import warnings
 
-from aiohttp.web import Application, RouteTableDef, HTTPInternalServerError, run_app, Response, 
+from aiohttp.web import Application, RouteTableDef, HTTPInternalServerError, run_app, Response, HTTPFound
 from argparse import ArgumentParser
 from sys import platform
 from serv_plugins.storage import isnull
@@ -23,7 +23,7 @@ parser = ArgumentParser(description = 'Project argument')
 parser.add_argument('--host', help = 'Host to listen', default = 'localhost')
 parser.add_argument('--port', help = 'Port for accept connection', default = '9000')
 
-# Get photos, CSS and more
+# Get images, CSS and more
 
 @routes.get('/styles/style.css')
 async def server_get_style(request):
@@ -33,36 +33,68 @@ async def server_get_style(request):
 		content_type='text/css'
 	)
 
-@routes.get('/photos/logot.ico')
+@routes.get('/images/logot.ico')
 async def server_get_logo(request):
-	photo = await binder.server_get_photo('photos/logot.ico')
+	photo = await binder.server_get_photo('images/logot.ico')
 	return Response(
-		text=photo,
+		body=photo,
 		content_type='image/x-icon'
 	)
 
-@routes.get('/photos/example__img_before.png')
+@routes.get('/images/example__img_before.png')
 async def server_get_example__img_before(request):
-	photo = await binder.server_get_photo('photos/example__img_before.png')
+	photo = await binder.server_get_photo('images/example__img_before.png')
 	return Response(
-		text=photo,
-		content_type='image'
+		body=photo,
+		content_type='image/png'
 	)
 
-@routes.get('/photos/example__img_after.png')
+@routes.get('/images/example__img_after.png')
 async def server_get_example__img_after(request):
-	photo = await binder.server_get_photo('photos/example__img_after.png')
+	photo = await binder.server_get_photo('images/example__img_after.png')
 	return Response(
-		text=photo,
-		content_type='image'
+		body=photo,
+		content_type='image/png'
 	)
 
-@routes.get('/photos/example__img_arrow.svg')
+@routes.get('/images/example__img_arrow.svg')
 async def server_get_example__img_arrow(request):
-	photo = await binder.server_get_photo('photos/example__img_arrow.svg')
+	photo = await binder.server_get_photo('images/example__img_arrow.svg')
 	return Response(
-		text=photo,
-		content_type='image'
+		body=photo,
+		content_type='image/svg+xml'
+	)
+
+@routes.get('/images/mag-glass.png')
+async def server_getmag_glass(request):
+	photo = await binder.server_get_photo('images/mag-glass.png')
+	return Response(
+		body=photo,
+		content_type='image/png'
+	)
+
+@routes.get('/images/egg.png')
+async def server_get_egg(request):
+	photo = await binder.server_get_photo('images/egg.png')
+	return Response(
+		body=photo,
+		content_type='image/png'
+	)
+
+@routes.get('/api-styles/style.css')
+async def server_api_get_style(request):
+	style = await binder.get_page('api-styles/style.css')
+	return Response(
+		text=style,
+		content_type='text/css'
+	)
+
+@routes.get('/images/proc.png')
+async def server_get_proc(request):
+	photo = await binder.server_get_photo('images/proc.png')
+	return Response(
+		body=photo,
+		content_type='image/png'
 	)
 
 # Get pages
@@ -77,7 +109,11 @@ async def main_page(request):
 
 @routes.post('/api')
 async def api_page(request):
-	pass
+	page = await binder.get_page('api.html')
+	if isnull(page):
+		raise HTTPInternalServerError()
+	else:
+		return Response(text = page, content_type='text/html')
 
 @routes.get('/api')
 async def api_page_get(request):
@@ -87,10 +123,20 @@ async def api_page_get(request):
 	else:
 		return Response(text = some_page, content_type='text/html')
 
-@routes.get('/os')
-async def get_open_source(request):
+@routes.get('/github')
+async def github_redirect(request):
+	raise HTTPFound('https://github.com/YakovSava/raw_bot_face_recognition')
+
+@routes.get('/telegram')
+async def telegram_redirect(request):
 	# Redirect
 	...
+
+@routes.get('/vk')
+async def vkontakte_redirect(request):
+	# Redirect
+	...
+
 
 if __name__ == '__main__':
 	args = parser.parse_args()

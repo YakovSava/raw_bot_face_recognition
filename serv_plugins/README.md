@@ -33,4 +33,3 @@ All Python libraries used:
 - *argpasre* (**standart library**)
 - *sys* (**standart library**)
 - *aiohttp*
-<blockquote> And *uvloop* in Linux </blockquote>

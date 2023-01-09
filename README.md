@@ -5,7 +5,7 @@ The server is written using the *aiohttp* library and despite the fact that the 
 The bot was created based on the aiogram library (*also an asynchronous library*) and does the same thing as the server, but it is not connected to the server itself, and does not send anything to it, but tries to recognize the face itself
 
 # Site
-In turn, the site was created for me by a [*good friend*](https://github.com/LolKekChebureck), his separate repository with the source code of the site pages [*code*](https://github.com/YakovSava/raw_bot_face_recognition/tree/main/html)
+In turn, the site was created for me by a [*good friend*](https://github.com/LolKekChebureck), his separate repository with the source code of the site pages [*code*](https://github.com/LolKekChebureck/face-bot)
 <blockquote> Give him an asterisk </blockquote>
 
 ### The essence of the project
@@ -17,4 +17,4 @@ this project was created to show projects at the [Tchaikovsky Industrial College
 1. Backend, bot, neural network - Python
 2. Site page with description of methods - HTML, CSS
 3. Drop-down menu on the site - JS, CSS
-4. Part of the neural network library - C/C++/Cython
+4. Some parts of plugins - JS, C++

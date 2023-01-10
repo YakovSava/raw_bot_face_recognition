@@ -1,7 +1,7 @@
 import asyncio
 import warnings
 
-from aiohttp.web import Application, RouteTableDef, HTTPInternalServerError, run_app, Response, HTTPFound
+from aiohttp.web import Application, RouteTableDef, HTTPInternalServerError, run_app, Response, HTTPFound, json_response
 from argparse import ArgumentParser
 from sys import platform
 from serv_plugins.storage import isnull
@@ -104,6 +104,58 @@ async def server_get_scripts(request):
 		text=script_text,
 		content_type='text/javascript'
 	)
+
+# Api
+
+@routes.get('/api/recognition')
+async def api_get_recognition(request):
+	return json_response(data={'response': {'error': 1, 'description': 'Not GET, POST!'}})
+
+@routes.post('/api/recognition')
+async def api_post_recognition(request):
+	raise NotImplemented
+
+@routes.get('/api/text')
+async def api_get_text_recognition(request):
+	return json_response(data={'response': {'error': 1, 'description': 'Not GET, POST!'}})
+
+@routes.post('/api/text')
+async def api_post_text_recognition(request):
+	raise NotImplemented
+
+@routes.get('/api/all')
+async def api_get_all_methods(request):
+	return json_response(data={'response': {'all': [
+		['/api/recognition', 'POST'],
+		['/api/text', 'POST'],
+		['/api/all', 'GET'],
+		['/api/open', 'GET'],
+		['/api/links', 'GET'],
+		['/api/recognition/put', 'PUT'],
+		['/api/recognition/delete', 'DELETE']
+	]}})
+
+@routes.get('/api/open')
+async def api_get_open_source(request):
+	self_file = await binder.get_open_source()
+	return json_response(data={'response': {'open': self_file}})
+
+@routes.get('/api/links')
+async def api_get_all_links(request):
+	return json_response(data={'response': {'all': [
+		['github', 'https://github.com/YakovSava/raw_bot_face_recognition'],
+		['vk', ''],
+		['tg', ''],
+		['site', '']
+	]}})
+
+@routes.put('/api/recognition/put')
+async def api_recognition_put(request):
+	raise NotImplemented
+
+@routes.delete('/api/recognition/delete')
+async def api_recognition_delete(request):
+	raise NotImplemented
 
 # Get pages
 

@@ -69,3 +69,7 @@ class Binder:
 	async def server_get_photo(self, name:str) -> bytes:
 		async with async_open(join(self.html_file, name), 'rb') as photo:
 			return await photo.read()
+
+	async def get_open_source(self) -> str:
+		async with async_open('server.py', 'r', encoding='utf-8') as py:
+			return await py.read()

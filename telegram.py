@@ -14,7 +14,7 @@ from config import tgtoken
 
 if platform in ['win32', 'cygwin', 'msys']:
 	try:
-		asyncio.set_event_loop(asyncio.WindowsSelectorEventLoopPolicy())
+		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 	except:
 		pass
 

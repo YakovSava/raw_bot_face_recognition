@@ -1,1 +1,4 @@
-Режим вывода команд на экран (ECHO) отключен.
+from vkbottle_types import BaseStateGroup
+
+class SendPhotoState(BaseStateGroup):
+	photo = 0

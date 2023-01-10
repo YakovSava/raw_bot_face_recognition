@@ -1,11 +1,12 @@
 import asyncio
 import warnings
 
-from aiohttp.web import Application, RouteTableDef, HTTPInternalServerError, run_app, Response, HTTPFound, json_response
 from argparse import ArgumentParser
 from sys import platform
-from serv_plugins.storage import isnull
+from aiohttp.web import Application, RouteTableDef, HTTPInternalServerError, run_app, Response, HTTPFound, json_response
 from serv_plugins.binder import Binder
+from serv_plugins.random_generator import Generator
+from serv_plugins.utils import exists,exists_key
 
 warnings.filterwarnings('ignore')
 
@@ -18,6 +19,7 @@ if platform in ['win32', 'cygwin', 'msys']:
 app = Application()
 routes = RouteTableDef()
 binder = Binder()
+gen = Generator()
 parser = ArgumentParser(description = 'Project argument')
 
 parser.add_argument('--host', help = 'Host to listen', default = 'localhost')
@@ -112,8 +114,15 @@ async def api_get_recognition(request):
 	return json_response(data={'response': {'error': 1, 'description': 'Not GET, POST!'}})
 
 @routes.post('/api/recognition')
-async def api_post_recognition(request):
-	raise NotImplemented
+async def api_post_recognition(request, data:dict):
+	if exists(data):
+		key = await gen.get()
+		if (await binder.save_photo(data['image'], f'{key}.png')):
+			return json_response(data={'response': {'key': key}})
+		else:
+			return json_response(data={'response': {'error': 3, 'description': 'This is not photo'}})
+	else:
+		return json_response(data={'response': {'error': 2, 'description': 'File not found'}})
 
 @routes.get('/api/text')
 async def api_get_text_recognition(request):
@@ -150,19 +159,36 @@ async def api_get_all_links(request):
 	]}})
 
 @routes.put('/api/recognition/put')
-async def api_recognition_put(request):
-	raise NotImplemented
+async def api_recognition_put(request, data:dict):
+	if exists_key(data):
+		key = data['key']
+		if (await gen.check(key)):
+			try:
+				ai_data = await binder.get_photo(f'{key}.png')
+			except:
+				return json_response(data={'response': {'error': 2, 'description': 'File not found'}})
+			return json_response(data={'response': {'image': ai_data, 'key': key}})
+		return json_response(data={'response': {'error': 4, 'description': 'Key not exists'}})
+	return json_response(data={'response': {'error': 5, 'description': 'Key not found'}})
 
 @routes.delete('/api/recognition/delete')
-async def api_recognition_delete(request):
-	raise NotImplemented
+async def api_recognition_delete(request, data:dict):
+	if exists_key(data):
+		key = data['key']
+		if (await gen.check(key)):
+			await binder.delete_photo(f'{key}.png')
+			await gen.delete(key)
+			return json_response(data={'response': {'succes': 1}})
+		return json_response(data={'response': {'error': 4, 'description': 'Key not exists'}})
+	return json_response(data={'response': {'error': 5, 'description': 'Key not found'}})
+
 
 # Get pages
 
 @routes.get('/')
 async def main_page(request):
 	some_page = await binder.get_page('index.html')
-	if isnull(some_page):
+	if not (some_page):
 		raise HTTPInternalServerError()
 	else:
 		return Response(text = some_page, content_type='text/html')
@@ -170,7 +196,7 @@ async def main_page(request):
 @routes.post('/api')
 async def api_page(request):
 	page = await binder.get_page('api.html')
-	if isnull(page):
+	if not (page):
 		raise HTTPInternalServerError()
 	else:
 		return Response(text = page, content_type='text/html')
@@ -178,7 +204,7 @@ async def api_page(request):
 @routes.get('/api')
 async def api_page_get(request):
 	some_page = await binder.get_page('api.html')
-	if isnull(some_page):
+	if not (some_page):
 		raise HTTPInternalServerError()
 	else:
 		return Response(text = some_page, content_type='text/html')

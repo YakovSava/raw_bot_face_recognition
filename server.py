@@ -11,7 +11,7 @@ warnings.filterwarnings('ignore')
 
 if platform in ['win32', 'cygwin', 'msys']:
 	try:
-		asyncio.set_event_loop(asyncio.WindowsSelectorEventLoopPolicy())
+		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 	except:
 		pass
 
@@ -95,6 +95,14 @@ async def server_get_proc(request):
 	return Response(
 		body=photo,
 		content_type='image/png'
+	)
+
+@routes.get('/scripts/script.js')
+async def server_get_scripts(request):
+	script_text = await binder.get_page('scripts/script.js')
+	return Response(
+		text=script_text,
+		content_type='text/javascript'
 	)
 
 # Get pages

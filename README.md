@@ -15,6 +15,7 @@ this project was created to show projects at the [Tchaikovsky Industrial College
 
 ### Used programming languages
 1. Backend, bot, neural network - [Python](https://github.com/YakovSava/raw_bot_face_recognition/search?l=python)
-2. Site page with description of methods - [HTML](https://github.com/YakovSava/raw_bot_face_recognition/search?l=html), [CSS](https://github.com/YakovSava/raw_bot_face_recognition/search?l=css), [SCSS](https://github.com/YakovSava/raw_bot_face_recognition/search?l=scss)
+2. Site page with description of methods - [HTML](https://github.com/YakovSava/raw_bot_face_recognition/search?l=html), [CSS](https://github.com/YakovSava/raw_bot_face_recognition/search?l=css)
 3. Drop-down menu on the site - [JS](https://github.com/YakovSava/raw_bot_face_recognition/search?l=javascript), [CSS](https://github.com/YakovSava/raw_bot_face_recognition/search?l=css)
-4. Some parts of plugins - [JS](https://github.com/YakovSava/raw_bot_face_recognition/search?l=javascript), [C++](https://github.com/YakovSava/raw_bot_face_recognition/search?l=c%2B%2B)
+4. Some parts of plugins - [C++](https://github.com/YakovSava/raw_bot_face_recognition/search?l=c%2B%2B)
+5. Dev tools - [Shell](https://github.com/YakovSava/raw_bot_face_recognition/search?l=shell), [Batch](https://github.com/YakovSava/raw_bot_face_recognition/search?l=batchfile)

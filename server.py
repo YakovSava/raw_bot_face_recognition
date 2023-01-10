@@ -119,10 +119,8 @@ async def api_post_recognition(request, data:dict):
 		key = await gen.get()
 		if (await binder.save_photo(data['image'], f'{key}.png')):
 			return json_response(data={'response': {'key': key}})
-		else:
-			return json_response(data={'response': {'error': 3, 'description': 'This is not photo'}})
-	else:
-		return json_response(data={'response': {'error': 2, 'description': 'File not found'}})
+		return json_response(data={'response': {'error': 3, 'description': 'This is not photo'}})
+	return json_response(data={'response': {'error': 2, 'description': 'File not found'}})
 
 @routes.get('/api/text')
 async def api_get_text_recognition(request):

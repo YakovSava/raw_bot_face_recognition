@@ -2,10 +2,20 @@ import warnings
 import asyncio
 
 from vkbottle.bot import Bot, Message
-from vkbottle import VKAPIError
+from vkbottle import PhotoMessageUploader
 from sys import platform
 from vkplugins.keyboards import keyboards
+from bot_plugins.binder import Binder
+from bot_plugins.ai import recognition, recognize
+from serv_plugins.random_generator import Generator
 from config import vktoken
+
+try:
+	from loguru import logger
+except ImportError:
+	pass
+else:
+	logger.disable('vkbottle')
 
 warnings.filterwarnings('ignore')
 
@@ -17,6 +27,8 @@ if platform in ['win32', 'cygwin', 'msys']:
 
 vk = Bot(token=vktoken)
 vk.on.vbml_ignore_case = True
+gen = Generator()
+binder = Binder()
 
 @vk.on.private_message(text='Начать')
 async def start_handler(message:Message):
@@ -32,13 +44,21 @@ async def menu_handler(message:Message):
 
 @vk.on.private_message(payload={'recognition': 0})
 async def recognition_handler(message:Message):
-	...
-	# Pass this step
+	await message.answer('Ожидайте ответа')
+	key = await gen.get(); await gen.delete(key)
+	absolute_path = await binder.downoload_photo(message.attachments[0][0].url, f'{key}.png')
+	ai_resp = await recognition(absolute_path)
+	attach = await PhotoMessageUploader(vk.api).upload(ai_resp)
+	await message.answer('Ответ нейросети:', attachment=attach, keyboard=keyboards.back)
 
 @vk.on.private_message(payload={'text': 0, 'recognition': 0})
 async def text_recognition_handler(message:Message):
-	...
-	# Pass this step
+	await message.answer('Ожидайте ответа')
+	key = await gen.get(); await gen.delete(key)
+	absolute_path = await binder.downoload_photo(message.attachments[0][0].url, f'{key}.png')
+	ai_resp = await recognize(f'{key}.png')
+	user_photo = await PhotoMessageUploader(vk.api).upload(absolute_path)
+	await message.answer(f'Ответ нейросети:\n{ai_resp}', attachment=user_photo, keyboard=keyboards.back)
 
 @vk.on.private_message(payload={'developer': 0})
 async def show_developer_handler(message:Message):
@@ -55,6 +75,9 @@ async def show_site_handler(message:Message):
 async def this_command_not_exists(message:Message):
 	await message.answer('Ваша комана не распознана', keyboard=keyboards.back)
 
+async def polling():
+	await vk.run_polling()
+
 if __name__ == '__main__':
 	loop = asyncio.get_event_loop()
-	loop.run_until_complete(vk.run_polling())
+	loop.run_until_complete(polling())

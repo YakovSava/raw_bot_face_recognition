@@ -221,11 +221,10 @@ async def vkontakte_redirect(request):
 	# Redirect
 	...
 
+async def runner():
+	app.add_routes(routes)
+	run_app(app, host=args.host, port=args.port)
 
 if __name__ == '__main__':
 	args = parser.parse_args()
-	app.add_routes(routes)
-	try:
-		run_app(app, host = args.host, port = args.port)
-	except OSError as err:
-		print(f'Error with host/port - {err}')
+	asyncio.run(runner())

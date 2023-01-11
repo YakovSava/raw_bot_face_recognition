@@ -2,7 +2,11 @@
 # include <string>
 using namespace std;
 
-auto slurp(string_view path) -> string {
+# ifdef __cplusplus
+extern "C" {
+# endif
+
+auto slurp(string path) -> string {
 	constexpr auto read_size = size_t(4096);
 	auto stream = ifstream(path.data());
 	stream.exceptions(ios_base::badbit);
@@ -16,16 +20,22 @@ auto slurp(string_view path) -> string {
 	return out;
 }
 
-extern "C" {auto get(string filename) {
+auto get(char* fname) {
+	// char* re = new char(fname);
+	string filename (*fname, 10);
 	ifstream file;
 	file.open(filename);
 	if (file.is_open()){
-		auto all_lines = slurp(filename);
+		string all_lines = slurp(filename);
 		file.close();
 		return all_lines;
 	} else {
 		file.close();
 	}
-}}
+}
 
 int main() { return 0; }
+
+# ifdef __cplusplus
+}
+# endif

@@ -8,7 +8,7 @@ extern "C" {
 
 int write(char *fname, char *alll) {
 	string filename (fname, 10);
-	string all_lines (alll, 10);
+	string all_lines (alll, 50);
 	ofstream file;
 	file.open(filename, ios::app);
 	if (file.is_open()) {

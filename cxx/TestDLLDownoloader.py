@@ -8,16 +8,11 @@ if platform in ['linux', 'linux2']:
 elif platform in ['win32', 'cygwin', 'msys']:
 	end = '.dll'
 
-writer = ctypes.CDLL(f'./writer{end}')
+writer = ctypes.CDLL(f'./writer.cxx{end}')
 reader = ctypes.CDLL(f'./reader{end}')
 encryptor = ctypes.CDLL(f'./encrypt{end}')
 
 writer.write.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
 writer.write.restype = ctypes.c_int
 
-print(
-	writer.write(
-		ctypes.c_char_p(b'file.txt'),
-		ctypes.c_char_p(b'Hello!')
-	)
-)
+print(writer.write(ctypes.c_char_p(b'file.txt'), ctypes.c_char_p(b'1')))

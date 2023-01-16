@@ -1,0 +1,4 @@
+LIBRARY "pass"
+;DESCRIPTION 'call dll from python'
+EXPORTS
+    write

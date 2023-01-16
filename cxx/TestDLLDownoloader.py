@@ -1,4 +1,5 @@
 from ctypes import *
+from os import getcwd
 from sys import platform
 
 if platform in ['linux', 'linux2']:
@@ -6,19 +7,14 @@ if platform in ['linux', 'linux2']:
 elif platform in ['win32', 'cygwin', 'msys']:
 	end = '.dll'
 
-writer = windll.LoadLibrary(f'./writer.cxx{end}')
+writer = oledll.LoadLibrary(f'./writer.cxx{end}')
 # reader = ctypes.CDLL(f'./reader{end}')
 # encryptor = ctypes.CDLL(f'./encrypt{end}')
 
-string = 'Hi!'
-string = string.encode('utf-16')
+a = c_char_p(f'{getcwd()}\\file.txt'.encode())
+b = c_char_p(b'Help me pls')
 
-print(string)
-
-a = c_char_p(b'file.txt')
-b = c_char_p(string)
-
-# writer.write.argtypes = [c_char_p, c_char_p]
+writer.write.argtypes = [c_char_p, c_char_p]
 writer.write.restype = c_int
 
-print(writer.write(a, a))
+print(writer.write(a, b))

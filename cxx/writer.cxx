@@ -1,20 +1,19 @@
 # include <fstream>
-# include <string>
 # include <iostream>
-using namespace std;
 
 # ifdef __cplusplus
-extern "C" {
+extern "C" __declspec(dllexport) {
+using namespace std;
 # endif
 
-int write(char* fname, char* alll) {
-	// string filename (fname, 10);
-	string all_lines (alll, 50);
+int write(char* filename, char* all_lines) {
 	ofstream file;
-	file.open(fname);
-	cout << all_lines << fname << endl;
+	file.open(filename);
+	cout << "Filename: " << filename << endl;
+	cout << "File lines: " << all_lines << endl;
+	cout << "Is open: " << file.is_open() << endl;
 	if (file.is_open()) {
-		file << all_lines;
+		file << all_lines << endl;
 		file.close();
 		return 1;
 	} else {
@@ -22,8 +21,6 @@ int write(char* fname, char* alll) {
 		return 0;
 	}
 }
-
-int main() { return 0; }
 
 # ifdef __cplusplus
 }

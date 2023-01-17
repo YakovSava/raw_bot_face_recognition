@@ -4,9 +4,9 @@ import warnings
 from sys import platform
 from os.path import join
 from random import randint
-from aiogram import Bot, Dispatcher, executor
+from aiogram import Bot, Dispatcher, Router
 from aiogram.types import Message
-from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.fsm.context import FSMContext 
 from bots_plugins.binder import Binder
 from bots_plugins.ai import recognition, recognize
 from bots_plugins.states import PhotoReg, RegPhotoToRecognizeText
@@ -22,22 +22,22 @@ warnings.filterwarnings('ignore')
 
 binder = Binder()
 bot = Bot(tgtoken)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
-@dp.message_handler(commands=['start', 'run', 'menu'])
+@dp.message(commands=['start', 'run', 'menu'])
 async def start_handler(message:Message):
 	await message.answer('''Привет!
 Это бот по распознаванию лица. Этот бот может распознавать лица и текст на фото!\
 По команде "/recognition" (следующим сообщением надо отправить фото после предупреждения бота) вы можеет воспользоваться функционалом бота)\
 По сообщению "/text" бот будет распознаввать текст на фото''')
 
-@dp.message_handler(commands=['rec', 'recognition'])
+@dp.message(commands=['rec', 'recognition'])
 async def recognition_first_handler(message:Message):
 	await message.answer('Следующем сообщением бот попытается распозанать лицо! Он обрежет лицо от всей остальной фотографии и скажет что это.\
 Если он это не увидит то вернёт вмечте с фото значение "unknow face"')
 	await PhotoReg.photo.set()
 
-@dp.message_handler(state=PhotoReg.photo, content_type=['photo'])
+@dp.message(state=PhotoReg.photo, content_type=['photo'])
 async def recognition_second_handler(message:Message, state:FSMContext):
 	await message.answer('Ожидайте ответа')
 	await state.finish()
@@ -46,17 +46,17 @@ async def recognition_second_handler(message:Message, state:FSMContext):
 	face_response = await recognition(photo_name)
 	photo = await binder.get_photo(photo_name)
 	await bot.send_photo(
-		chat_id = message['from']['id'],
-		photo = photo,
-		caption = face_response
+		chat_id=message['from']['id'],
+		photo=photo,
+		caption=face_response
 	)
 
-@dp.message_handler(commands=['text'])
+@dp.message(commands=['text'])
 async def text_recognition_handler(message:Message):
 	await message.answer('Следующим сообщением отправьте фотграфию, бот её распознает и отправит вам текст!')
 	await RegPhotoToRecognizeText.photo.set()
 
-@dp.message_handler(state=RegPhotoToRecognizeText.photo, content_type=['photo'])
+@dp.message(state=RegPhotoToRecognizeText.photo, content_type=['photo'])
 async def text_recognition_second_handler(message:Message, state:FSMContext):
 	await message.answer('Ожидайте ответа')
 	await state.finish()
@@ -65,7 +65,7 @@ async def text_recognition_second_handler(message:Message, state:FSMContext):
 	ai_response = await recognize(photo_name)
 	await message.answer(f'Ответ ИИ: {ai_response}')
 
-@dp.message_handler(commands=['dev', 'developer'])
+@dp.message(commands=['dev', 'developer'])
 async def developer_handler(message:Message):
 	await message.answer('Разработчик: Савельев Яков\n\
 Разработано для: Чайковский индустриальный колледж (http://spo-chik)\n\
@@ -73,7 +73,7 @@ GitHub: https://github.com/yakovsava/\n\
 Open source: https://github.com/yakovsava/raw_bot_face_recognition')
 
 async def polling(): 
-	executor(dp, skip_updates = True)
+	await dp.start_polling(bot)
 
 if __name__ == '__main__':
 	asyncio.run(polling())

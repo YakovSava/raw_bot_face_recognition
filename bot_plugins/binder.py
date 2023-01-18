@@ -21,6 +21,7 @@ class Binder:
 		self.cache_path = 'cache/'
 		if not isdir(self.cache_path[:-1]):
 			mkdir(self.cache_path[:-1])
+		asyncio.run(self._async_setter())
 
 	async def _async_setter(self):
 		self.session = ClientSession(trust_env=True)

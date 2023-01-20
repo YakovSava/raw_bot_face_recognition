@@ -7,9 +7,7 @@ if platform in ['linux', 'linux2']:
 elif platform in ['win32', 'cygwin', 'msys']:
 	end = '.dll'
 
-writer = oledll.LoadLibrary(f'./writer.cxx{end}')
-# reader = ctypes.CDLL(f'./reader{end}')
-# encryptor = ctypes.CDLL(f'./encrypt{end}')
+writer = CDLL(f'./writer{end}')
 
 a = c_char_p(f'{getcwd()}\\file.txt'.encode())
 b = c_char_p(b'Help me pls')

@@ -1,18 +1,17 @@
 # include <fstream>
 using namespace std;
 
-
-extern "C" {
-int write(char* filename, char* all_lines) {
+extern "C" __declspec(dllexport)
+int write(const char* filename, const char* all_lines) {
 	ofstream file;
-	file.open(filename);
+	file.open(filename, ios::out);
 	if (file.is_open()) {
-		file << all_lines << endl;
-		file.close();
-		return 1;
-	} else {
-		file.close();
+		file << "What" << endl;
 		return 0;
+	} else {
+		return 1;
 	}
 }
-}
+
+extern "C" __declspec(dllexport)
+int main() { write("file.txt", "help"); return 0; }

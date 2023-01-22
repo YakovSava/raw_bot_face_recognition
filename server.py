@@ -213,18 +213,17 @@ async def github_redirect(request):
 
 @routes.get('/telegram')
 async def telegram_redirect(request):
-	# Redirect
-	...
+	raise HTTPFound('https://t.me/face_rrecognition_bot')
 
 @routes.get('/vk')
 async def vkontakte_redirect(request):
 	# Redirect
 	...
 
-async def runner():
+def runner():
+	args = parser.parse_args()
 	app.add_routes(routes)
 	run_app(app, host=args.host, port=args.port)
 
 if __name__ == '__main__':
-	args = parser.parse_args()
-	asyncio.run(runner())
+	runner()

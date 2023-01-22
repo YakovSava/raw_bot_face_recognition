@@ -4,5 +4,3 @@ __pycache__
 serv_plugins/__pycache__
 bot_plugins/__pycache__
 serv_plugins/face_classifier/__pycache__
-config.py
-parameters.json

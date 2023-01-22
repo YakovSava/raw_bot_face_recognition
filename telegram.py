@@ -2,7 +2,6 @@ import asyncio
 import warnings
 
 from sys import platform
-from os.path import join
 from random import randint
 from aiogram import Bot, Dispatcher, executor
 from aiogram.types import Message
@@ -67,7 +66,7 @@ async def text_recognition_second_handler(message:Message, state:FSMContext):
 	file_info = await bot.get_file(message.photo[-1].file_id)
 	downloaded_file = await bot.download_file(file_info.file_path)
 	photo_name = await binder.save_photo(photoname, downloaded_file)
-	ai_response = await recognition(photo_name)
+	ai_response = await recognize(photo_name)
 	await message.answer(f'Ответ ИИ: {ai_response}')
 
 @dp.message_handler(commands=['dev', 'developer'])
@@ -77,5 +76,8 @@ async def developer_handler(message:Message):
 GitHub: https://github.com/yakovsava/\n\
 Open source: https://github.com/yakovsava/raw_bot_face_recognition')
 
-if __name__ == '__main__':
+def polling():
 	executor.start_polling(dp, skip_updates=True)
+
+if __name__ == '__main__':
+	polling()

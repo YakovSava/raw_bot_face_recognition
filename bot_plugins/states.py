@@ -5,3 +5,6 @@ class PhotoReg(StatesGroup):
 
 class RegPhotoToRecognizeText(StatesGroup):
 	photo = State()
+
+class Qiwi(StatesGroup):
+	qiwi = State()

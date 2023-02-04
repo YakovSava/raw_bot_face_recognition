@@ -220,10 +220,10 @@ async def vkontakte_redirect(request):
 	# Redirect
 	...
 
-def runner():
+def runner(loop=asyncio.get_event_loop()):
 	args = parser.parse_args()
 	app.add_routes(routes)
-	run_app(app, host=args.host, port=args.port)
+	run_app(app, host=args.host, port=args.port, loop=loop)
 
 if __name__ == '__main__':
 	runner()

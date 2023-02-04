@@ -16,8 +16,8 @@ class TextRecognizer:
 	async def recognition(self, filename:str=None) -> str:
 		if filename is None:
 			raise self.OCRError('Filename is None!')
-		elif not exists(join(self.path, filename)):
+		elif not exists(filename):
 			raise self.OCRError('File name is not exists!')
 		else:
-			return (self.reader.readtext(join(self.path, filename), detail=0))
+			return (self.reader.readtext(filename, detail=0))
 			

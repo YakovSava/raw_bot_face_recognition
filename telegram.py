@@ -76,8 +76,8 @@ async def developer_handler(message:Message):
 GitHub: https://github.com/yakovsava/\n\
 Open source: https://github.com/yakovsava/raw_bot_face_recognition')
 
-def polling():
-	executor.start_polling(dp, skip_updates=True)
+def polling(loop=asyncio.get_event_loop()):
+	executor.start_polling(dp, skip_updates=True, loop=loop)
 
 if __name__ == '__main__':
 	polling()

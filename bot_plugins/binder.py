@@ -28,9 +28,9 @@ class Binder:
 		self.session = ClientSession(trust_env=True)
 
 	async def get_photo(self, name:str) -> bytes:
-		async with aiopen(join(self.cache_path, name), 'wb') as photo:
+		async with aiopen(name, 'rb') as photo:
 			img = await photo.read()
-		remove(join(self.cache_path, name))
+		remove(name)
 		return img
 
 	async def get_parameters(self) -> dict:

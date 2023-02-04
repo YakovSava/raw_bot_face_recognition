@@ -13,10 +13,10 @@ class FaceClassifier:
 		img = cv2.imread(image)
 
 		def classifyFace():
-			prediction = classify(image, "./tf/training_output/retrained_graph.pb", "./tf/training_output/retrained_labels.txt", shape=224)
+			prediction = classify(image, "./serv_plugins/face_classifier/tf/training_output/retrained_graph.pb", "./serv_plugins/face_classifier/tf/training_output/retrained_labels.txt", shape=224)
 			nonlocal text
 			text = prediction[0][0]
-		face_cascade = cv2.CascadeClassifier("./face_cascade/haarcascade_frontalface_default.xml")
+		face_cascade = cv2.CascadeClassifier("./serv_plugins/face_classifier/face_cascade/haarcascade_frontalface_default.xml")
 
 		text = "unknown face"
 		exceptional_frames = 100

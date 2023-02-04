@@ -19,3 +19,6 @@ this project was created to show projects at the [Tchaikovsky Industrial College
 3. Drop-down menu on the site - [JS](https://github.com/YakovSava/raw_bot_face_recognition/search?l=javascript), [CSS](https://github.com/YakovSava/raw_bot_face_recognition/search?l=css)
 4. Some parts of plugins - [C++](https://github.com/YakovSava/raw_bot_face_recognition/search?l=c%2B%2B)
 5. Dev tools - [Shell](https://github.com/YakovSava/raw_bot_face_recognition/search?l=shell), [Batch](https://github.com/YakovSava/raw_bot_face_recognition/search?l=batchfile)
+
+### Plans
+The current plans are to slightly change the structure of the project, add a database, register in bots, make a basis for commercial use

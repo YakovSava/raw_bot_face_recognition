@@ -11,10 +11,6 @@ class Binder:
 		self._setter()
 
 	def _setter(self) -> None:
-		if not exists(self.config_file):
-			with open(self.config_file, 'w', encoding = 'utf-8') as file:
-				file.writelines(['{', '\t"admin": 0,', '\t"token": ""', '}'])
-			print('Config file is create')
 		if not isdir(self.cache_path):
 			mkdir(self.cache_path)
 			print('Cache path is create')

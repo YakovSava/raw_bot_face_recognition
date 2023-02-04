@@ -1,5 +1,5 @@
 # Что бы вы понимали. я случайно удалил файл...
-from os.path import exists, isdir, join
+from os.path import exists, isdir
 from os import mkdir
 from easyocr import Reader
 

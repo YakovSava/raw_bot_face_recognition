@@ -137,6 +137,7 @@ async def qiwi_handler_step1(message:Message):
 @dp.message_handler(state=Qiwi.qiwi)
 async def qiwi_handler_step2(message:Message, state:FSMContext):
 	if message.text.isdigit():
+		await state.finish()
 		if int(message.text) > 0:
 			to_bill = int(message.text)
 		else:
@@ -160,8 +161,13 @@ async def check_pay(call:CallbackQuery, callback_data:dict):
 	price = await qiwi.bill(bill_id=callback_data['bill'])
 	if price.status == 'PAID':
 		await call.message.answer(f'Вы успешно оплатили и ваш баланс теперь пополнен на {price.amount} рублей!')
+		await database.edit_int(
+			edited_id=call.message.from_id,
+			what='balance',
+			to=int(round(price.amount, 0))
+		)
 	else:
-		await call.message.answer('Оплата пока ещё нен поступала')
+		await call.message.answer('Оплата пока ещё не поступала')
 
 def polling(loop=asyncio.get_event_loop()):
 	executor.start_polling(dp, skip_updates=True, loop=loop)

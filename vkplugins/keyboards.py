@@ -1,6 +1,10 @@
-from vkbottle import Keyboard, KeyboardButtonColor, Text
+from vkbottle import Keyboard, KeyboardButtonColor, Text, VKPay
 
 class keyboards:
+	class inline:
+		check_pay = (Keyboard()
+			.add(Text('Проверить оплату', payload={'check': 0}), color=KeyboardButtonColor.POSITIVE)
+		).get_json()
 	start = (Keyboard(one_time=True, inline=False)
 		.add(Text('Меню', payload={'menu': 1}), color=KeyboardButtonColor.POSITIVE)
 	).get_json()
@@ -10,8 +14,22 @@ class keyboards:
 		.row()
 		.add(Text('Разработчик', payload={'developer': 0}), color=KeyboardButtonColor.PRIMARY)
 		.row()
-		.add(Text('Сайт', payload={'site': 0}), color=KeyboardButtonColor.NEGATIVE)
+		.add(Text('API', payload={'api': 0}), color=KeyboardButtonColor.POSITIVE)
+		.row()
+		.add(Text('Оплатить бота', payload={'pay': 0}), color=KeyboardButtonColor.SECONDARY)
 	).get_json()
 	back = (Keyboard(one_time=True, inline=False)
+		.add(Text('Вернуться назад', payload={'menu': 1}), color=KeyboardButtonColor.POSITIVE)
+	).get_json()
+	pay = (Keyboard()
+		.add(Text('Оплатить через Qiwi', payload={'qiwi': 0}), color=KeyboardButtonColor.PRIMARY)
+		.row()
+		.add(Text('Оплатить через VK Pay', payload={'VKPay': 0}), color=KeyboardButtonColor.PRIMARY)
+		.row()
+		.add(Text('Вернуться назад', payload={'menu': 1}), color=KeyboardButtonColor.POSITIVE)
+	).get_json()
+	vk_pay = lambda group_id, amount: (Keyboard()
+		.add(VKPay(payload={'vkpay': 0}, hash=f'action=pay-to-group&amount={amount}&group_id={group_id}'), color=KeyboardButtonColor.PRIMARY)
+		.row()
 		.add(Text('Вернуться назад', payload={'menu': 1}), color=KeyboardButtonColor.POSITIVE)
 	).get_json()

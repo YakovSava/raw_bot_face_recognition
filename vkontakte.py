@@ -117,10 +117,13 @@ async def vkpay_step2(message:Message):
 		else:
 			to_bill = 100
 		group_id = (await vk.api.groups.get_by_id())[0].id
-		await message.answer(f'Персональная ссылка для оплаты: {price.pay_url}', keyboard=keyboards.inline.check_pay)
-		await message.answer('Ссылка работает лишь 30 минут, потому советуем вам оплатить скорее!', keyboard=keyboards.back)
+		await message.answer(f'Персональная кнопка для оплаты:', keyboard=keyboards.vkpay(group_id, to_bill))
 	else:
 		await message.answer('Введите ЧИСЛО')
+
+@vk.on.private_message(payload={'vkpay': 0, 'pay': 1})
+async def vkpay_pay(message:Message):
+	pass
 
 @vk.on.private_message()
 async def this_command_not_exists(message:Message):

@@ -29,7 +29,7 @@ class keyboards:
 		.add(Text('Вернуться назад', payload={'menu': 1}), color=KeyboardButtonColor.POSITIVE)
 	).get_json()
 	vk_pay = lambda group_id, amount: (Keyboard()
-		.add(VKPay(payload={'vkpay': 0}, hash=f'action=pay-to-group&amount={amount}&group_id={group_id}'), color=KeyboardButtonColor.PRIMARY)
+		.add(VKPay(payload={'vkpay': 0, 'pay': 1}, hash=f'action=pay-to-group&amount={amount}&group_id={group_id}'), color=KeyboardButtonColor.PRIMARY)
 		.row()
 		.add(Text('Вернуться назад', payload={'menu': 1}), color=KeyboardButtonColor.POSITIVE)
 	).get_json()

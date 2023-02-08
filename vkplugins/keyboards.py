@@ -2,8 +2,8 @@ from vkbottle import Keyboard, KeyboardButtonColor, Text, VKPay
 
 class keyboards:
 	class inline:
-		check_pay = (Keyboard()
-			.add(Text('Проверить оплату', payload={'check': 0}), color=KeyboardButtonColor.POSITIVE)
+		check_pay = lambda bill_id: (Keyboard()
+			.add(Text('Проверить оплату', payload={'check': 0, 'bill_id': bill_id}), color=KeyboardButtonColor.POSITIVE)
 		).get_json()
 	start = (Keyboard(one_time=True, inline=False)
 		.add(Text('Меню', payload={'menu': 1}), color=KeyboardButtonColor.POSITIVE)
@@ -29,7 +29,7 @@ class keyboards:
 		.add(Text('Вернуться назад', payload={'menu': 1}), color=KeyboardButtonColor.POSITIVE)
 	).get_json()
 	vk_pay = lambda group_id, amount: (Keyboard()
-		.add(VKPay(payload={'vkpay': 0, 'pay': 1}, hash=f'action=pay-to-group&amount={amount}&group_id={group_id}'), color=KeyboardButtonColor.PRIMARY)
+		.add(VKPay(payload={'vkpay': 0, 'pay': 1, 'amount': amount}, hash=f'action=pay-to-group&amount={amount}&group_id={group_id}'), color=KeyboardButtonColor.PRIMARY)
 		.row()
 		.add(Text('Вернуться назад', payload={'menu': 1}), color=KeyboardButtonColor.POSITIVE)
 	).get_json()

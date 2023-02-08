@@ -5,7 +5,7 @@ from sys import platform
 from random import randint
 from pyqiwip2p import AioQiwiP2P
 from vkbottle.bot import Bot, Message
-from vkbottle import PhotoMessageUploader
+from vkbottle import PhotoMessageUploader, ABCRule
 from vkplugins.keyboards import keyboards
 from vkplugins.states import SendPhotoState, InputQiwiAmount, InputVkPayAmount
 from bot_plugins.binder import Binder
@@ -28,41 +28,82 @@ if platform in ['win32', 'cygwin', 'msys']:
 	except:
 		pass
 
+class VKPay(ABCRule[Message]):
+	async def check(self, message:Message):
+		payload = eval(f'{message.payload}')
+		try: payload['vkpay'], payload['pay']
+		except: return False
+		else: return True
+
+class CheckerQiwi(ABCRule[Message]):
+	async def check(self, message:Message):
+		payload = eval(f'{message.payload}')
+		try: payload['check'], payload['bill_id']
+		except: return False
+		else: return True
+
 vk = Bot(token=vktoken)
 vk.on.vbml_ignore_case = True
+uploader = PhotoMessageUploader(vk.api)
 binder = Binder()
 qiwi = AioQiwiP2P(qiwi_token)
+null = None
 
 @vk.on.private_message(text='Начать')
 async def start_handler(message:Message):
+	if (await vk.state_dispenser.get(message.from_id)) is not None:
+		await vk.state_dispenser.delete(message.from_id)
 	await message.answer('Здравствуйте!\nЭто бот для обнаружения лица на фотографии ли распознаванию текста на ней.\n\
-Для того что бы начать нажмите на кнопку ниже', keyboard=keyboards.start)
+Для того что бы начать необходимо авторизоваться', keyboard=keyboards.start)
 
 @vk.on.private_message(payload={'menu': 0})
 async def menu_handler(message:Message):
+	if (await database.exists(message.from_id)):
+		await database.reg({
+			'id': message.from_id,
+			'balance': 0
+		})
+		await message.answer('Вы успешно зарегестрированы и теперь вам доступны некоторые возможности бота!')
 	await message.answer('Выберите одно из действий ниже:\n\
 Распознование - распознает лицо на фото\n\
 Текст - распознает текст на фото (могут быть ложные срабатывания; не работает с капчей)\n\
-Разработчик - отобразить информацию о разработчике\n\
-Сайт - перевдёт вас на сайт', keyboard=keyboards.menu)
+Разработчик - отобразить информацию о разработчике', keyboard=keyboards.menu)
 
 @vk.on.private_message(payload={'recognition': 0})
 async def recognition_handler(message:Message):
+	await message.answer('Следующим сообщением отправьте вашу фотографию на которой необходимо распознать человека\n\
+Бот обрежет лицо человека и попытается распознать его лицо. Если у него не получиться это сделать, он вернёт ответ "Unknow face"')
+	await vk.state_dispenser.set(message.from_id, SendPhotoState.photo)
+
+@vk.on.private_message(state=SendPhotoState.photo)
+async def await_photo(message:Message):
+	await vk.state_dispenser.delete(message.from_id)
 	await message.answer('Ожидайте ответа')
 	name = f'{message.from_id}_{randint(1000, 9999)}.png'
+	print(message.attachments)
 	absolute_path = await binder.downoload_photo(message.attachments[0][0].url, name)
 	ai_resp = await recognition(absolute_path)
-	attach = await PhotoMessageUploader(vk.api).upload(ai_resp)
+	attach = await uploader.upload(ai_resp)
 	await message.answer('Ответ нейросети:', attachment=attach, keyboard=keyboards.back)
 
 @vk.on.private_message(payload={'text': 0, 'recognition': 0})
 async def text_recognition_handler(message:Message):
-	await message.answer('Ожидайте ответа')
-	name = f'{message.from_id}_{randint(1000, 9999)}.png'
-	absolute_path = await binder.downoload_photo(message.attachments[-1][0].url, name)
-	ai_resp = await recognize(name)
-	user_photo = await PhotoMessageUploader(vk.api).upload(absolute_path)
-	await message.answer(f'Ответ нейросети:\n{ai_resp}', attachment=user_photo, keyboard=keyboards.back)
+	await message.answer('Следующим сообщением отправьте фотографию на которой необходимо распознать текст\n\
+ЕСли отправите фото без текста, бот пришлёт пустой ответ')
+	await vk.state_dispenser.set(message.from_id, SendPhotoState.text)
+
+@vk.on.private_message(state=SendPhotoState.text)
+async def await_text(message:Message):
+	if message.attachments is not None:
+		await vk.state_dispenser.delete(message.from_id)
+		await message.answer('Ожидайте ответа')
+		name = f'{message.from_id}_{randint(1000, 9999)}.png'
+		absolute_path = await binder.downoload_photo(message.attachments[-1][0].url, name)
+		ai_resp = await recognize(name)
+		user_photo = await uploader.upload(absolute_path)
+		await message.answer(f'Ответ нейросети:\n{" ".join(ai_resp)}', attachment=user_photo, keyboard=keyboards.back)
+	else:
+		await message.answer('Вы не прислали фото!')
 
 @vk.on.private_message(payload={'developer': 0})
 async def show_developer_handler(message:Message):
@@ -103,7 +144,7 @@ async def qiwi_pay_step2(message:Message):
 	else:
 		await message.answer('Введите ЧИСЛО')
 
-@vk.on.private_message(payload={'qiwi': 0})
+@vk.on.private_message(payload={'VKPay': 0})
 async def vkpay_step1(message:Message):
 	await vk.state_dispenser.set(message.from_id, InputVkPayAmount.amount)
 	await message.answer('Введите сумму которую хотите внести нна баланс')
@@ -121,17 +162,38 @@ async def vkpay_step2(message:Message):
 	else:
 		await message.answer('Введите ЧИСЛО')
 
-@vk.on.private_message(payload={'vkpay': 0, 'pay': 1})
+@vk.on.private_message(VKPay())
 async def vkpay_pay(message:Message):
-	pass
+	amount = eval(f'{message.payload}')['amount']
+	await message.answer(f'Вы успешно пополнили баланс на {amount} рублей')
+	if amount == 42:
+		await message.answer('Вы купили жизнь!')
+	await database.edit_int(
+		edited_id=message.from_id,
+		what='balance',
+		to=amount
+	)
+
+@vk.on.private_message(CheckerQiwi())
+async def check_qiwi_pay(message:Message):
+	payload = eval(f'{message.payload}')
+	bill = await qiwi.bill(bill_id=payload['bill_id'])
+	if bill.status == 'PAID':
+		await message.answer(f'Вы успешно пополнили баланс на {bill.amount} рублей')
+		if bill.amount == 42:
+			await message.answer('Вы купили жизнь!')
+		await database.edit_int(
+			edited_id=message.from_id,
+			what='balance',
+			to=int(bill.amount)
+		)
+	else:
+		await message.answer('Оплата ещё не поступала')
 
 @vk.on.private_message()
 async def this_command_not_exists(message:Message):
 	await message.answer('Ваша команда не распознана', keyboard=keyboards.back)
 
-async def polling():
-	await vk.run_polling()
-
 if __name__ == '__main__':
 	loop = asyncio.get_event_loop()
-	loop.run_until_complete(polling())
+	loop.run_until_complete(vk.run_polling())

@@ -1,7 +1,6 @@
 import asyncio
 import warnings
 
-from sys import platform
 from random import randint
 from pyqiwip2p import AioQiwiP2P
 from aiogram import Bot, Dispatcher, executor
@@ -15,12 +14,6 @@ from bot_plugins.ai import recognition, recognize
 from bot_plugins.states import PhotoReg, RegPhotoToRecognizeText, Qiwi
 from serv_plugins.database import database
 from config import tgtoken, qiwi_token
-
-if platform in ['win32', 'cygwin', 'msys']:
-	try:
-		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-	except:
-		pass
 
 warnings.filterwarnings('ignore')
 
@@ -63,10 +56,13 @@ async def recognition_second_handler(message:Message, state:FSMContext):
 	photo_name = await binder.save_photo(photoname, downloaded_file)
 	face_response = await recognition(photo_name)
 	photo = await binder.get_photo(photo_name)
+	keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+	keyboard.add(['/menu'])
 	await bot.send_photo(
 		chat_id=message['from']['id'],
 		photo=photo,
-		caption=face_response
+		caption=face_response,
+		reply_markup=keyboard
 	)
 
 @dp.message_handler(commands=['text'])
@@ -86,14 +82,18 @@ async def text_recognition_second_handler(message:Message, state:FSMContext):
 	downloaded_file = await bot.download_file(file_info.file_path)
 	photo_name = await binder.save_photo(photoname, downloaded_file)
 	ai_response = await recognize(photo_name)
-	await message.answer(f'Ответ ИИ: {ai_response}')
+	keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+	keyboard.add(['/menu'])
+	await message.answer(f'Ответ ИИ: {" ".join(ai_response)}', reply_markup=keyboard)
 
 @dp.message_handler(commands=['dev', 'developer'])
 async def developer_handler(message:Message):
+	keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+	keyboard.add(['/menu'])
 	await message.answer('Разработчик: Савельев Яков\n\
 Разработано для: Чайковский индустриальный колледж (http://spo-chik)\n\
 GitHub: https://github.com/yakovsava/\n\
-Open source: https://github.com/yakovsava/raw_bot_face_recognition')
+Open source: https://github.com/yakovsava/raw_bot_face_recognition', reply_markup=keyboard)
 
 @dp.message_handler(commands=['/reg'])
 async def reg_handler(message:Message):

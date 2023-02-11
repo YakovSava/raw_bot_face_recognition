@@ -1,7 +1,6 @@
 import warnings
 import asyncio
 
-from sys import platform
 from random import randint
 from pyqiwip2p import AioQiwiP2P
 from vkbottle.bot import Bot, Message
@@ -13,20 +12,14 @@ from bot_plugins.ai import recognition, recognize
 from serv_plugins.database import database
 from config import vktoken, qiwi_token
 
-try:
-	from loguru import logger
-except ImportError:
-	pass
-else:
-	logger.disable('vkbottle')
+# try:
+# 	from loguru import logger
+# except ImportError:
+# 	pass
+# else:
+# 	logger.disable('vkbottle')
 
 warnings.filterwarnings('ignore')
-
-if platform in ['win32', 'cygwin', 'msys']:
-	try:
-		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-	except:
-		pass
 
 class VKPay(ABCRule[Message]):
 	async def check(self, message:Message):
@@ -58,7 +51,7 @@ async def start_handler(message:Message):
 
 @vk.on.private_message(payload={'menu': 0})
 async def menu_handler(message:Message):
-	if (await database.exists(message.from_id)):
+	if not (await database.exists(message.from_id)):
 		await database.reg({
 			'id': message.from_id,
 			'balance': 0
@@ -77,14 +70,16 @@ async def recognition_handler(message:Message):
 
 @vk.on.private_message(state=SendPhotoState.photo)
 async def await_photo(message:Message):
-	await vk.state_dispenser.delete(message.from_id)
-	await message.answer('Ожидайте ответа')
-	name = f'{message.from_id}_{randint(1000, 9999)}.png'
-	print(message.attachments)
-	absolute_path = await binder.downoload_photo(message.attachments[0][0].url, name)
-	ai_resp = await recognition(absolute_path)
-	attach = await uploader.upload(ai_resp)
-	await message.answer('Ответ нейросети:', attachment=attach, keyboard=keyboards.back)
+	if message.attachments is not None:
+		await vk.state_dispenser.delete(message.from_id)
+		await message.answer('Ожидайте ответа')
+		name = f'{message.from_id}_{randint(1000, 9999)}.png'
+		absolute_path = await binder.downoload_photo(message.attachments[-1].photo.sizes[-1].url, name)
+		ai_resp = await recognition(absolute_path)
+		attach = await uploader.upload(ai_resp)
+		await message.answer('Ответ нейросети:', attachment=attach, keyboard=keyboards.back)
+	else:
+		await message.answer('Вы не отправили фото!')
 
 @vk.on.private_message(payload={'text': 0, 'recognition': 0})
 async def text_recognition_handler(message:Message):
@@ -98,7 +93,7 @@ async def await_text(message:Message):
 		await vk.state_dispenser.delete(message.from_id)
 		await message.answer('Ожидайте ответа')
 		name = f'{message.from_id}_{randint(1000, 9999)}.png'
-		absolute_path = await binder.downoload_photo(message.attachments[-1][0].url, name)
+		absolute_path = await binder.downoload_photo(message.attachments[-1].photo.sizes[-1].url, name)
 		ai_resp = await recognize(name)
 		user_photo = await uploader.upload(absolute_path)
 		await message.answer(f'Ответ нейросети:\n{" ".join(ai_resp)}', attachment=user_photo, keyboard=keyboards.back)
@@ -195,5 +190,5 @@ async def this_command_not_exists(message:Message):
 	await message.answer('Ваша команда не распознана', keyboard=keyboards.back)
 
 if __name__ == '__main__':
-	loop = asyncio.get_event_loop()
+	loop = asyncio.new_event_loop(); asyncio.set_event_loop(loop)
 	loop.run_until_complete(vk.run_polling())

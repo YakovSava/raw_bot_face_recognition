@@ -10,12 +10,6 @@ from serv_plugins.face_classifier.tensorBinder import face_rec, TextRecognizer
 
 warnings.filterwarnings('ignore')
 
-if platform in ['win32', 'cygwin', 'msys']:
-	try:
-		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-	except:
-		pass
-
 app = Application()
 routes = RouteTableDef()
 binder = Binder()

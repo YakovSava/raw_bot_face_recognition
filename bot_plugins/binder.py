@@ -1,19 +1,12 @@
 import asyncio
 import warnings
 
+from os import mkdir, remove
+from os.path import isdir, join
 from aiofiles import open as aiopen
 from aiohttp import ClientSession
-from sys import platform
-from os.path import isdir, join
-from os import mkdir, remove
 
 warnings.filterwarnings('ignore')
-
-if platform in ['win32', 'cygwin', 'msys']:
-	try:
-		asyncio.set_event_loop(asyncio.WindowsSelectorEventLoopPolicy())
-	except:
-		pass
 
 class Binder:
 
@@ -21,8 +14,9 @@ class Binder:
 		self.cache_path = 'cache/'
 		if not isdir(self.cache_path[:-1]):
 			mkdir(self.cache_path[:-1])
-		loop = asyncio.get_event_loop()
+		loop = asyncio.new_event_loop()
 		loop.run_until_complete(self._async_setter())
+		loop.close()
 
 	async def _async_setter(self):
 		self.session = ClientSession(trust_env=True)

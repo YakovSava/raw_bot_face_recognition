@@ -8,9 +8,8 @@ from random import choice
 class DataBase:
 
 	def __init__(self):
-		loop = asyncio.new_event_loop()
+		loop = asyncio.get_event_loop()
 		loop.run_until_complete(self._construct())
-		loop.close()
 
 	async def _construct(self):
 		self.connection = await aiosqlite.connect('cache/users.db', check_same_thread=False)

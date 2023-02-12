@@ -1,5 +1,5 @@
 from os import mkdir, remove
-from os.path import exists, isdir, join
+from os.path import isdir, join
 from aiofiles import open as async_open
 
 class Binder:
@@ -8,9 +8,6 @@ class Binder:
 		self.config_file = 'parameters.json'
 		self.cache_path = 'cache'
 		self.html_file = 'html'
-		self._setter()
-
-	def _setter(self) -> None:
 		if not isdir(self.cache_path):
 			mkdir(self.cache_path)
 			print('Cache path is create')

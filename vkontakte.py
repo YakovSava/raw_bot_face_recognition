@@ -38,8 +38,8 @@ class CheckerQiwi(ABCRule[Message]):
 vk = Bot(token=vktoken)
 vk.on.vbml_ignore_case = True
 uploader = PhotoMessageUploader(vk.api)
-binder = Binder()
 qiwi = AioQiwiP2P(qiwi_token)
+binder = Binder()
 null = None
 
 @vk.on.private_message(text='Начать')
@@ -76,8 +76,8 @@ async def await_photo(message:Message):
 		name = f'{message.from_id}_{randint(1000, 9999)}.png'
 		absolute_path = await binder.downoload_photo(message.attachments[-1].photo.sizes[-1].url, name)
 		ai_resp = await recognition(absolute_path)
-		attach = await uploader.upload(ai_resp)
-		await message.answer('Ответ нейросети:', attachment=attach, keyboard=keyboards.back)
+		attach = await uploader.upload(absolute_path)
+		await message.answer(f'Ответ нейросети: {ai_resp}\n\nЛицо найденное на фото:', attachment=attach, keyboard=keyboards.back)
 	else:
 		await message.answer('Вы не отправили фото!')
 
@@ -94,7 +94,7 @@ async def await_text(message:Message):
 		await message.answer('Ожидайте ответа')
 		name = f'{message.from_id}_{randint(1000, 9999)}.png'
 		absolute_path = await binder.downoload_photo(message.attachments[-1].photo.sizes[-1].url, name)
-		ai_resp = await recognize(name)
+		ai_resp = await recognize(absolute_path)
 		user_photo = await uploader.upload(absolute_path)
 		await message.answer(f'Ответ нейросети:\n{" ".join(ai_resp)}', attachment=user_photo, keyboard=keyboards.back)
 	else:
@@ -134,7 +134,7 @@ async def qiwi_pay_step2(message:Message):
 			amount=to_bill,
 			comment='Оплата бота'
 		)
-		await message.answer(f'Персональная ссылка для оплаты: {price.pay_url}', keyboard=keyboards.inline.check_pay)
+		await message.answer(f'Персональная ссылка для оплаты: {price.pay_url}', keyboard=keyboards.inline.check_pay(price.bill_id))
 		await message.answer('Ссылка работает лишь 30 минут, потому советуем вам оплатить скорее!', keyboard=keyboards.back)
 	else:
 		await message.answer('Введите ЧИСЛО')
@@ -174,9 +174,9 @@ async def check_qiwi_pay(message:Message):
 	payload = eval(f'{message.payload}')
 	bill = await qiwi.bill(bill_id=payload['bill_id'])
 	if bill.status == 'PAID':
-		await message.answer(f'Вы успешно пополнили баланс на {bill.amount} рублей')
 		if bill.amount == 42:
 			await message.answer('Вы купили жизнь!')
+		await message.answer(f'Вы успешно пополнили баланс на {bill.amount} рублей', keyboard=keyboards.back)
 		await database.edit_int(
 			edited_id=message.from_id,
 			what='balance',
@@ -189,6 +189,9 @@ async def check_qiwi_pay(message:Message):
 async def this_command_not_exists(message:Message):
 	await message.answer('Ваша команда не распознана', keyboard=keyboards.back)
 
+async def polling():
+	await vk.run_polling()
+
 if __name__ == '__main__':
-	loop = asyncio.new_event_loop(); asyncio.set_event_loop(loop)
-	loop.run_until_complete(vk.run_polling())
+	loop = asyncio.get_event_loop()
+	loop.run_until_complete(polling())

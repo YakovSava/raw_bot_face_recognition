@@ -14,9 +14,8 @@ class Binder:
 		self.cache_path = 'cache/'
 		if not isdir(self.cache_path[:-1]):
 			mkdir(self.cache_path[:-1])
-		loop = asyncio.new_event_loop()
+		loop = asyncio.get_event_loop()
 		loop.run_until_complete(self._async_setter())
-		loop.close()
 
 	async def _async_setter(self):
 		self.session = ClientSession(trust_env=True)
@@ -34,9 +33,9 @@ class Binder:
 
 	async def downoload_photo(self, url:str, filename:str) -> str:
 		async with self.session.get(url) as resp:
-			if resp == 200:
+			if resp.status == 200:
 				async with aiopen(join(self.cache_path, filename), 'wb') as new_photo:
-					await new_photo.write(resp.content)
+					await new_photo.write(await resp.read())
 		return join(self.cache_path, filename)
 
 	async def save_photo(self, name:str, content:bytes) -> str:
@@ -53,4 +52,6 @@ class Binder:
 		await self.session.close()
 
 	def __del__(self):
-		asyncio.run(self._destructor())
+		loop = asyncio.get_event_loop()
+		loop.run_until_complete(self._destructor())
+		loop.close()

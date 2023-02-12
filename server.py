@@ -1,7 +1,6 @@
 import asyncio
 import warnings
 
-from os.path import join
 from random import randint
 from argparse import ArgumentParser
 from aiohttp.web import Application, RouteTableDef, run_app, Response, HTTPFound, json_response

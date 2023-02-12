@@ -23,7 +23,7 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 qiwi = AioQiwiP2P(qiwi_token)
 cb = CallbackData('Bill Storage', 'bill')
 
-@dp.message_handler(commands=['start', 'run', 'menu'])
+@dp.message_handler(commands=['start', 'run', 'menu', 'back'])
 async def start_handler(message:Message):
 	keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 	is_registred = await database.exists(message.from_id)
@@ -34,7 +34,7 @@ async def start_handler(message:Message):
 По сообщению "/text" бот будет распознаввать текст на фото
 
 {'Однако что бы пользоваться ботом, необходимо зарегестрироваться командой "/reg"'
-if is_registred else
+if not is_registred else
 f"Что бы пользоваться ботом, необходимо иметь на балансе 0 рублей"}''')
 
 @dp.message_handler(commands=['rec', 'recognition'])
@@ -83,19 +83,19 @@ async def text_recognition_second_handler(message:Message, state:FSMContext):
 	photo_name = await binder.save_photo(photoname, downloaded_file)
 	ai_response = await recognize(photo_name)
 	keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-	keyboard.add(['/menu'])
+	keyboard.add(*['/menu'])
 	await message.answer(f'Ответ ИИ: {" ".join(ai_response)}', reply_markup=keyboard)
 
 @dp.message_handler(commands=['dev', 'developer'])
 async def developer_handler(message:Message):
 	keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-	keyboard.add(['/menu'])
+	keyboard.add(*['/menu'])
 	await message.answer('Разработчик: Савельев Яков\n\
 Разработано для: Чайковский индустриальный колледж (http://spo-chik)\n\
 GitHub: https://github.com/yakovsava/\n\
 Open source: https://github.com/yakovsava/raw_bot_face_recognition', reply_markup=keyboard)
 
-@dp.message_handler(commands=['/reg'])
+@dp.message_handler(commands=['reg'])
 async def reg_handler(message:Message):
 	keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 	keyboard.add(*['/developer', '/recognition', '/start', '/api', '/balance'])
@@ -103,20 +103,19 @@ async def reg_handler(message:Message):
 		await message.answer('Вы уже зарегестрированы! Вам не необходимо регестрироваться снова!', reply_markup=keyboard)
 	else:
 		await database.reg({
-			'vk': 0,
-			'tg': message.from_id,
+			'id': message.from_id,
 			'balance': 0
 		})
 		await message.answer('Вы успешно зарегестрированы! Теперь вам доступны некоторые функции бота!', reply_markup=keyboard)
 
-@dp.message_handler(commands=['/api'])
+@dp.message_handler(commands=['api'])
 async def api_handler(message:Message):
 	keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 	keyboard.add(*['/back'])
 	token = await database.get_token(message.from_id)
 	await message.answer(f'Вот ваш токен: {token}\n\n{"Теперь вы можете отправлять запросы напрямую к API" if token.lower() != "зарегестрируйтесь!" else "Вы не зарегестрированы, потому вам не выдан токен!"}')
 
-@dp.message_handler(commands=['/balance'])
+@dp.message_handler(commands=['balance'])
 async def balance_handler(message:Message):
 	keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 	if (await database.exists(message.from_id)):
@@ -126,7 +125,7 @@ async def balance_handler(message:Message):
 		keyboard.add('/reg')
 		await message.answer('Вы не можете даже пополнить кошелёк ввиду его отсутствия!\nЗарегестрируйтесь!', reply_markup=keyboard)
 
-@dp.message_handler(commands=['/qiwi'])
+@dp.message_handler(commands=['qiwi'])
 async def qiwi_handler_step1(message:Message):
 	if (await database.exists(message.from_id)):
 		await message.answer('Напишите число на которое вы хотите пополнить ваш баланс')

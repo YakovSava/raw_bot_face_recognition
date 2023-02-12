@@ -1,9 +1,10 @@
 import asyncio
 import warnings
 
+from os.path import join
+from random import randint
 from argparse import ArgumentParser
-from sys import platform
-from aiohttp.web import Application, RouteTableDef, HTTPInternalServerError, run_app, Response, HTTPFound, json_response
+from aiohttp.web import Application, RouteTableDef, run_app, Response, HTTPFound, json_response
 from serv_plugins.binder import Binder
 from serv_plugins.database import database
 from serv_plugins.face_classifier.tensorBinder import face_rec, TextRecognizer
@@ -16,8 +17,8 @@ binder = Binder()
 parser = ArgumentParser(description = 'Project argument')
 recognizer = TextRecognizer()
 
-parser.add_argument('--host', help = 'Host to listen', default = 'localhost')
-parser.add_argument('--port', help = 'Port for accept connection', default = '9000')
+parser.add_argument('--host', help='Host to listen', default='localhost')
+parser.add_argument('--port', help='Port for accept connection', default='9000')
 
 # Get images, CSS and more
 
@@ -110,7 +111,14 @@ async def api_post_recognition(request):
 
 	try:
 		if (await database.exists_token(data['token'])):
-			pass
+			filename = f'{data["token"]}_{randint(1000, 9999)}.png'
+			path = await binder.save_photo(data['photo'], filename)
+			airesp = await face_rec(path)
+			new_photo = await binder.get_photo(path)
+			return json_response(data={
+				'photo': new_photo,
+				'response': airesp
+			})
 		else:
 			return Response(status=401)
 	except KeyError as ex:
@@ -118,17 +126,34 @@ async def api_post_recognition(request):
 
 @routes.post('/api/text')
 async def api_post_text_recognition(request):
-	raise NotImplemented
+	try: data = await request.json()
+	except Exception as ex: return Response(status=415, body=str(ex))
+
+	try:
+		if (await database.exists_token(data['token'])):
+			filename = f'{data["token"]}_{randint(1000, 9999)}.png'
+			path = await binder.save_photo(data['photo'], filename)
+			airesp = await recognizer.recognition(path)
+			new_photo = await binder.get_photo(path)
+			return json_response(data={
+				'photo': new_photo,
+				'response': airesp
+			})
+		else:
+			return Response(status=401)
+	except KeyError as ex:
+		return Response(status=406, body=str(ex))
 
 @routes.get('/api/all')
 async def api_get_all_methods(request):
-	return json_response(data={'response': {'all': [
+	return json_response(data={'all': [
 		['/api/recognition', 'POST'],
 		['/api/text', 'POST'],
 		['/api/all', 'GET'],
 		['/api/open', 'GET'],
-		['/api/links', 'GET']
-	]}})
+		['/api/links', 'GET'],
+		['/api/balance', 'GET']
+	]})
 
 @routes.get('/api/open')
 async def api_get_open_source(request):
@@ -137,13 +162,21 @@ async def api_get_open_source(request):
 
 @routes.get('/api/links')
 async def api_get_all_links(request):
-	return json_response(data={'response': {'all': [
+	return json_response(data={'all': [
 		['github', 'https://github.com/YakovSava/raw_bot_face_recognition'],
-		['vk', ''],
-		['tg', ''],
-		['site', '']
-	]}})
+		['vk', 'https://vk.me/face_bot_indproj'],
+		['tg', 'https://t.me/face_rrecognition_bot']
+	]})
 
+@routes.post('/api/balance')
+async def api_get_balance(request):
+	try: data = await request.json()
+	except Exception as ex: return Response(status=415, body=str(ex))
+
+	try:
+		if (await database.exists_token(data['token'])): pass
+		else: return Response(status=401)
+	except KeyError as ex: Response(status=406, body=str(ex))
 
 # Get pages
 
@@ -151,25 +184,25 @@ async def api_get_all_links(request):
 async def main_page(request):
 	some_page = await binder.get_page('index.html')
 	if not (some_page):
-		raise HTTPInternalServerError()
+		raise Response(status=500)
 	else:
-		return Response(text = some_page, content_type='text/html')
+		return Response(text=some_page, content_type='text/html')
 
 @routes.post('/api')
 async def api_page(request):
 	page = await binder.get_page('api.html')
 	if not (page):
-		raise HTTPInternalServerError()
+		raise Response(status=500)
 	else:
-		return Response(text = page, content_type='text/html')
+		return Response(text=page, content_type='text/html')
 
 @routes.get('/api')
 async def api_page_get(request):
 	some_page = await binder.get_page('api.html')
 	if not (some_page):
-		raise HTTPInternalServerError()
+		raise Response(status=500)
 	else:
-		return Response(text = some_page, content_type='text/html')
+		return Response(text=some_page, content_type='text/html')
 
 @routes.get('/github')
 async def github_redirect(request):
@@ -181,8 +214,7 @@ async def telegram_redirect(request):
 
 @routes.get('/vk')
 async def vkontakte_redirect(request):
-	# Redirect
-	...
+	raise HTTPFound('https://vk.me/face_bot_indproj')
 
 def runner(loop=asyncio.get_event_loop()):
 	args = parser.parse_args()

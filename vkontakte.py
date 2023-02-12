@@ -77,6 +77,7 @@ async def await_photo(message:Message):
 		absolute_path = await binder.downoload_photo(message.attachments[-1].photo.sizes[-1].url, name)
 		ai_resp = await recognition(absolute_path)
 		attach = await uploader.upload(absolute_path)
+		await binder.remove(absolute_path)
 		await message.answer(f'Ответ нейросети: {ai_resp}\n\nЛицо найденное на фото:', attachment=attach, keyboard=keyboards.back)
 	else:
 		await message.answer('Вы не отправили фото!')
@@ -96,6 +97,7 @@ async def await_text(message:Message):
 		absolute_path = await binder.downoload_photo(message.attachments[-1].photo.sizes[-1].url, name)
 		ai_resp = await recognize(absolute_path)
 		user_photo = await uploader.upload(absolute_path)
+		await binder.remove(absolute_path)
 		await message.answer(f'Ответ нейросети:\n{" ".join(ai_resp)}', attachment=user_photo, keyboard=keyboards.back)
 	else:
 		await message.answer('Вы не прислали фото!')

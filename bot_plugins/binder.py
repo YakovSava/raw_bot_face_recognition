@@ -47,6 +47,9 @@ class Binder:
 			async with aiopen(join(self.cache_path, name), 'wb') as photo:
 				await photo.write(content.read())
 			return join(self.cache_path, name)
+
+	async def remove(selff, name:str) -> None:
+		remove(name)
 	
 	async def _destructor(self):
 		await self.session.close()

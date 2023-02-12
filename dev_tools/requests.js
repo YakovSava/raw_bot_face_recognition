@@ -45,8 +45,6 @@ function methods(meth, methPath, dataFromUser) {
 }
 
 methods('POST', '/api/recognition', {})
-methods('PUT', '/api/recognition/put', {})
-methods('DELETE', '/api/recognition/delete', {})
 methods('POST', '/api/text', {})
 get('/api/all')
 get('/api/open')

@@ -152,7 +152,7 @@ async def api_get_all_methods(request):
 		['/api/all', 'GET'],
 		['/api/open', 'GET'],
 		['/api/links', 'GET'],
-		['/api/balance', 'GET']
+		['/api/balance', 'POST']
 	]})
 
 @routes.get('/api/open')
@@ -174,7 +174,14 @@ async def api_get_balance(request):
 	except Exception as ex: return Response(status=415, body=str(ex))
 
 	try:
-		if (await database.exists_token(data['token'])): pass
+		if (await database.exists_token(data['token'])):
+			id_ = await database.get_from_token(data['token'])
+			info = await database.get(id_)
+			return json_response(data={
+				'id': id_,
+				'quantity': info['quantity'],
+				'balance': info['balance']
+			})
 		else: return Response(status=401)
 	except KeyError as ex: Response(status=406, body=str(ex))
 

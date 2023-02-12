@@ -2,6 +2,7 @@ import asyncio
 
 from sys import argv
 from aiohttp import ClientSession, ClientResponse
+from aiofiles import open as aiopen
 
 async def main():
 	async with ClientSession(trust_env=True) as session:
@@ -20,14 +21,19 @@ async def main():
 						print(resp.status)
 					resp.close()
 
+				async with aiopen('test1.png', 'rb') as file:
+					f1 = await file.read()
+				async with aiopen('test0.png', 'rb') as file:
+					f0 = await file.read()
 				post_resps = await asyncio.gather(*[
 					asyncio.create_task(session.post(f'{host}/api/{method}', data=data))
 					for method, data in [
-						['recognition', {'token': 'dxlvzSMBPc', 'photo': open('test1.png', 'rb').read()}],
-						['text', {'token': 'dxlvzSMBPc', 'photo': open('test0.png', 'rb').read()}],
+						['recognition', {'token': 'dxlvzSMBPc', 'photo': f1}],
+						['text', {'token': 'dxlvzSMBPc', 'photo': f0}],
 						['balance', {'token': 'dxlvzSMBPc'}]
 					]
 				])
+				print({'token': 'dxlvzSMBPc', 'photo': f1})
 				for post_resp in post_resps:
 					post_resp:ClientResponse
 					print(await post_resp.read())

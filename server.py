@@ -113,12 +113,9 @@ async def api_post_recognition(request):
 		if (await database.exists_token(data['token'])):
 			filename = f'{data["token"]}_{randint(1000, 9999)}.png'
 			path = await binder.save_photo(data['photo'], filename)
-			airesp = await face_rec(path)
+			await face_rec(path)
 			new_photo = await binder.get_photo(path)
-			return json_response(data={
-				'photo': new_photo,
-				'response': airesp
-			})
+			return Response(body=new_photo)
 		else:
 			return Response(status=401)
 	except KeyError as ex:
@@ -134,11 +131,7 @@ async def api_post_text_recognition(request):
 			filename = f'{data["token"]}_{randint(1000, 9999)}.png'
 			path = await binder.save_photo(data['photo'], filename)
 			airesp = await recognizer.recognition(path)
-			new_photo = await binder.get_photo(path)
-			return json_response(data={
-				'photo': new_photo,
-				'response': airesp
-			})
+			return json_response(data={'text': airesp})
 		else:
 			return Response(status=401)
 	except KeyError as ex:

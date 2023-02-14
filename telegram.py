@@ -64,6 +64,7 @@ async def recognition_second_handler(message:Message, state:FSMContext):
 		caption=face_response,
 		reply_markup=keyboard
 	)
+	await database.edit_int(edited_id=message.from_id, to='quantity', what=1)
 
 @dp.message_handler(commands=['text'])
 async def text_recognition_handler(message:Message):
@@ -85,6 +86,7 @@ async def text_recognition_second_handler(message:Message, state:FSMContext):
 	keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 	keyboard.add(*['/menu'])
 	await message.answer(f'Ответ ИИ: {" ".join(ai_response)}', reply_markup=keyboard)
+	await database.edit_int(edited_id=message.from_id, to='quantity', what=1)
 
 @dp.message_handler(commands=['dev', 'developer'])
 async def developer_handler(message:Message):

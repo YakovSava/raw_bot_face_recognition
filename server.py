@@ -114,6 +114,8 @@ async def api_post_recognition(request):
 			path = await binder.save_photo(data['photo'], filename)
 			await face_rec(path)
 			new_photo = await binder.get_photo(path)
+			id_ = await database.get_from_token(data["token"])
+			await database.edit_int(edited_id=id_, to='quantity', what=1)
 			return Response(body=new_photo)
 		else:
 			return Response(status=401)
@@ -130,6 +132,8 @@ async def api_post_text_recognition(request):
 			filename = f'{data["token"]}_{randint(1000, 9999)}.png'
 			path = await binder.save_photo(data['photo'], filename)
 			airesp = await recognizer.recognition(path)
+			id_ = await database.get_from_token(data["token"])
+			await database.edit_int(edited_id=id_, to='quantity', what=1)
 			return json_response(data={'text': airesp})
 		else:
 			return Response(status=401)

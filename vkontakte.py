@@ -79,6 +79,7 @@ async def await_photo(message:Message):
 		attach = await uploader.upload(absolute_path)
 		await binder.remove(absolute_path)
 		await message.answer(f'Ответ нейросети: {ai_resp}\n\nЛицо найденное на фото:', attachment=attach, keyboard=keyboards.back)
+		await database.edit_int(edited_id=message.from_id, to='quantity', what=1)
 	else:
 		await message.answer('Вы не отправили фото!')
 
@@ -99,6 +100,7 @@ async def await_text(message:Message):
 		user_photo = await uploader.upload(absolute_path)
 		await binder.remove(absolute_path)
 		await message.answer(f'Ответ нейросети:\n{" ".join(ai_resp)}', attachment=user_photo, keyboard=keyboards.back)
+		await database.edit_int(edited_id=message.from_id, to='quantity', what=1)
 	else:
 		await message.answer('Вы не прислали фото!')
 

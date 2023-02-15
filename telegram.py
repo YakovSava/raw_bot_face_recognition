@@ -40,7 +40,8 @@ f"Что бы пользоваться ботом, необходимо имет
 @dp.message_handler(commands=['rec', 'recognition'])
 async def recognition_first_handler(message:Message):
 	if (await database.exists(message.from_id)):
-		if (await database.get(message.from_id))['balance'] <= 0:
+		parameters = await binder.get_parameters()
+		if (await database.get(message.from_id))['balance'] <= parameters['count']:
 			await message.answer('вы не можете пользоваться ботом пока вы его не оплатили')
 		else:
 			await message.answer('Следующем сообщением бот попытается распознать лицо! Он обрежет лицо от всей остальной фотографии и скажет что это.\
@@ -72,7 +73,8 @@ async def recognition_second_handler(message:Message, state:FSMContext):
 @dp.message_handler(commands=['text'])
 async def text_recognition_handler(message:Message):
 	if (await database.exists(message.from_id)):
-		if (await database.get(message.from_id))['balance'] <= 0:
+		parameters = await binder.get_parameters()
+		if (await database.get(message.from_id))['balance'] <= parameters['count']:
 			await message.answer('вы не можете пользоваться ботом пока вы его не оплатили')
 		else:
 			await message.answer('Следующим сообщением отправьте фотграфию, бот её распознает и отправит вам текст!')
@@ -175,6 +177,20 @@ async def check_pay(call:CallbackQuery, callback_data:dict):
 		)
 	else:
 		await call.message.answer('Оплата пока ещё не поступала')
+
+@dp.message_handler(commands=['admin'])
+async def admin_handler(message:Message):
+	parameters = await binder.get_parameters()
+	if message.from_id in parameters['admin']:
+		command = message.text.split()[1:]
+		if command[0] == 'count':
+			parameters['count'] = int(command[1])
+			await binder.edit_parameters(parameters)
+			await message.answer('Успешно изменено!')
+
+@dp.message_handler()
+async def this_command_not_exists(message:Message):
+	await message.answer('Команда написана неверно или её не сущевтсвует')
 
 def polling(loop=asyncio.get_event_loop()):
 	executor.start_polling(dp, skip_updates=True, loop=loop)

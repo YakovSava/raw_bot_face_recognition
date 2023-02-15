@@ -110,8 +110,8 @@ async def api_post_recognition(request):
 
 	try:
 		if (await database.exists_token(data['token'])):
-			id_ = await database.get_from_token(data["token"])
-			if (await database.get(id_))['balance'] <= 0:
+			id_ = await database.get_from_token(data["token"]); parameters = await binder.get_parameters()
+			if (await database.get(id_))['balance'] <= parameters['count']:
 				return Response(status=406)
 			filename = f'{data["token"]}_{randint(1000, 9999)}.png'
 			path = await binder.save_photo(data['photo'], filename)
@@ -131,8 +131,8 @@ async def api_post_text_recognition(request):
 
 	try:
 		if (await database.exists_token(data['token'])):
-			id_ = await database.get_from_token(data["token"])
-			if (await database.get(id_))['balance'] <= 0:
+			id_ = await database.get_from_token(data["token"]); parameters = await binder.get_parameters()
+			if (await database.get(id_))['balance'] <= parameters['count']:
 				return Response(status=406)
 			filename = f'{data["token"]}_{randint(1000, 9999)}.png'
 			path = await binder.save_photo(data['photo'], filename)

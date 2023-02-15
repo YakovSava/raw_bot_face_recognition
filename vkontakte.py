@@ -64,7 +64,8 @@ async def menu_handler(message:Message):
 
 @vk.on.private_message(payload={'recognition': 0})
 async def recognition_handler(message:Message):
-	if (await database.get(message.from_id))['balance'] <= 0:
+	parameters = await binder.get_parameters()
+	if (await database.get(message.from_id))['balance'] <= parameters['count']:
 		await message.answer('Вы не можете пользоваться ботом, пока у вас на балансе 0')
 	else:
 		await message.answer('Следующим сообщением отправьте вашу фотографию на которой необходимо распознать человека\n\
@@ -88,7 +89,8 @@ async def await_photo(message:Message):
 
 @vk.on.private_message(payload={'text': 0, 'recognition': 0})
 async def text_recognition_handler(message:Message):
-	if (await database.get(message.from_id))['balance'] <= 0:
+	parameters = await binder.get_parameters()
+	if (await database.get(message.from_id))['balance'] <= parameters['count']:
 		await message.answer('Вы не можете пользоваться ботом, пока у вас на балансе 0')
 	else:
 		await message.answer('Следующим сообщением отправьте фотографию на которой необходимо распознать текст\n\
@@ -194,6 +196,16 @@ async def check_qiwi_pay(message:Message):
 		)
 	else:
 		await message.answer('Оплата ещё не поступала')
+
+@vk.on.private_message(text='admin <e>')
+async def admin_handler(message:Message, e:str):
+	parameters = await binder.get_parameters()
+	if message.from_id in parameters['admin']:
+		command = e.split()
+		if command[0] == 'count':
+			parameters['count'] = int(command[1])
+			await binder.edit_parameters(parameters)
+			await message.answer('Успешно изменено!')
 
 @vk.on.private_message()
 async def this_command_not_exists(message:Message):

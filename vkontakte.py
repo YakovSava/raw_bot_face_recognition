@@ -1,5 +1,5 @@
-import warnings
 import asyncio
+import warnings
 
 from random import randint
 from pyqiwip2p import AioQiwiP2P
@@ -64,9 +64,12 @@ async def menu_handler(message:Message):
 
 @vk.on.private_message(payload={'recognition': 0})
 async def recognition_handler(message:Message):
-	await message.answer('Следующим сообщением отправьте вашу фотографию на которой необходимо распознать человека\n\
-Бот обрежет лицо человека и попытается распознать его лицо. Если у него не получиться это сделать, он вернёт ответ "Unknow face"')
-	await vk.state_dispenser.set(message.from_id, SendPhotoState.photo)
+	if (await database.get(message.from_id))['balance'] <= 0:
+		await message.answer('Вы не можете пользоваться ботом, пока у вас на балансе 0')
+	else:
+		await message.answer('Следующим сообщением отправьте вашу фотографию на которой необходимо распознать человека\n\
+	Бот обрежет лицо человека и попытается распознать его лицо. Если у него не получиться это сделать, он вернёт ответ "Unknow face"')
+		await vk.state_dispenser.set(message.from_id, SendPhotoState.photo)
 
 @vk.on.private_message(state=SendPhotoState.photo)
 async def await_photo(message:Message):
@@ -85,9 +88,12 @@ async def await_photo(message:Message):
 
 @vk.on.private_message(payload={'text': 0, 'recognition': 0})
 async def text_recognition_handler(message:Message):
-	await message.answer('Следующим сообщением отправьте фотографию на которой необходимо распознать текст\n\
-ЕСли отправите фото без текста, бот пришлёт пустой ответ')
-	await vk.state_dispenser.set(message.from_id, SendPhotoState.text)
+	if (await database.get(message.from_id))['balance'] <= 0:
+		await message.answer('Вы не можете пользоваться ботом, пока у вас на балансе 0')
+	else:
+		await message.answer('Следующим сообщением отправьте фотографию на которой необходимо распознать текст\n\
+	ЕСли отправите фото без текста, бот пришлёт пустой ответ')
+		await vk.state_dispenser.set(message.from_id, SendPhotoState.text)
 
 @vk.on.private_message(state=SendPhotoState.text)
 async def await_text(message:Message):

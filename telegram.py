@@ -40,9 +40,12 @@ f"Что бы пользоваться ботом, необходимо имет
 @dp.message_handler(commands=['rec', 'recognition'])
 async def recognition_first_handler(message:Message):
 	if (await database.exists(message.from_id)):
-		await message.answer('Следующем сообщением бот попытается распознать лицо! Он обрежет лицо от всей остальной фотографии и скажет что это.\
-Если он это не увидит то вернёт вмеcте с фото значение "unknow face"')
-		await PhotoReg.photo.set()
+		if (await database.get(message.from_id))['balance'] <= 0:
+			await message.answer('вы не можете пользоваться ботом пока вы его не оплатили')
+		else:
+			await message.answer('Следующем сообщением бот попытается распознать лицо! Он обрежет лицо от всей остальной фотографии и скажет что это.\
+	Если он это не увидит то вернёт вмеcте с фото значение "unknow face"')
+			await PhotoReg.photo.set()
 	else:
 		await message.answer('Вы не зарегестрированы и не можете пользоваться ботом')
 
@@ -69,8 +72,11 @@ async def recognition_second_handler(message:Message, state:FSMContext):
 @dp.message_handler(commands=['text'])
 async def text_recognition_handler(message:Message):
 	if (await database.exists(message.from_id)):
-		await message.answer('Следующим сообщением отправьте фотграфию, бот её распознает и отправит вам текст!')
-		await RegPhotoToRecognizeText.photo.set()
+		if (await database.get(message.from_id))['balance'] <= 0:
+			await message.answer('вы не можете пользоваться ботом пока вы его не оплатили')
+		else:
+			await message.answer('Следующим сообщением отправьте фотграфию, бот её распознает и отправит вам текст!')
+			await RegPhotoToRecognizeText.photo.set()
 	else:
 		await message.answer('Вы не зарегестрированы и не можете пользоваться ботом')
 

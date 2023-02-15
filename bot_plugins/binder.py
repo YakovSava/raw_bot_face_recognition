@@ -2,7 +2,8 @@ import asyncio
 import warnings
 
 from os import mkdir, remove
-from os.path import isdir, join
+from os.path import isdir, join, exists
+from json import dumps, loads
 from aiofiles import open as aiopen
 from aiohttp import ClientSession
 
@@ -14,6 +15,12 @@ class Binder:
 		self.cache_path = 'cache/'
 		if not isdir(self.cache_path[:-1]):
 			mkdir(self.cache_path[:-1])
+		if not exists(join(self.cache_path, 'parameters.json')):
+			with open('parameters.json', 'w', encoding='utf-8') as parameters:
+				parameters.write('''{
+	"admin": [],
+	"count": 0
+}''')
 		loop = asyncio.get_event_loop()
 		loop.run_until_complete(self._async_setter())
 
@@ -25,11 +32,6 @@ class Binder:
 			img = await photo.read()
 		remove(name)
 		return img
-
-	async def get_parameters(self) -> dict:
-		async with aiopen('parameters.json', 'r', encoding = 'utf-8') as file:
-			lines = await file.read()
-		return eval(f'{lines}')
 
 	async def downoload_photo(self, url:str, filename:str) -> str:
 		async with self.session.get(url) as resp:
@@ -50,6 +52,15 @@ class Binder:
 
 	async def remove(selff, name:str) -> None:
 		remove(name)
+
+	async def get_parameters(self) -> dict:
+		async with aiopen(join(self.cache_path, 'parameters.json'), 'r', encoding='utf-8') as parameters:
+			lines = await parameters.read()
+		return loads(lines)
+
+	async def edit_parameters(self, new_parameters:dict) -> None:
+		async with aiopen(join(self.cache_path, 'parameters.json'), 'w', encoding='utf-8') as parameters:
+			await parameters.write(f'{dumps(new_parameters)}')
 	
 	async def _destructor(self):
 		await self.session.close()

@@ -66,3 +66,8 @@ class Binder:
 	async def get_open_source(self) -> str:
 		async with aiopen('server.py', 'r', encoding='utf-8') as py:
 			return await py.read()
+
+	async def get_photo_by_name(self, filename:str) -> bytes:
+		async with aiopen(join(self.cache_path, filename), 'rb') as file: byte = await file.read()
+		remove(join(self.cache_path, filename))
+		return byte

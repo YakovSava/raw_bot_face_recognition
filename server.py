@@ -151,6 +151,11 @@ async def api_get_all_methods(request):
 		['/api/balance', 'POST']
 	]})
 
+@routes.post('/api/photo/{photo}')
+async def api_get_photo(request):
+	photo = await binder.get_photo_by_name(request.url.split('/')[-1])
+	return Response(body=photo)
+
 @routes.get('/api/open')
 async def api_get_open_source(request):
 	self_file = await binder.get_open_source()

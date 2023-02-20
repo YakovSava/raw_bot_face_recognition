@@ -12,12 +12,12 @@ from bot_plugins.ai import recognition, recognize
 from serv_plugins.database import database
 from config import vktoken, qiwi_token
 
-# try:
-# 	from loguru import logger
-# except ImportError:
-# 	pass
-# else:
-# 	logger.disable('vkbottle')
+try:
+	from loguru import logger
+except ImportError:
+	pass
+else:
+	logger.disable('vkbottle')
 
 warnings.filterwarnings('ignore')
 

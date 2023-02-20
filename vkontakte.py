@@ -84,6 +84,8 @@ async def await_photo(message:Message):
 		await binder.remove(absolute_path)
 		await message.answer(f'Ответ нейросети: {ai_resp}\n\nЛицо найденное на фото:', attachment=attach, keyboard=keyboards.back)
 		await database.edit_int(edited_id=message.from_id, to='quantity', what=1)
+		parameters = await binder.get_parameters()
+		await database.edit_int(edited_id=message.from_id, to='balance', what=-abs(parameters['count']))
 	else:
 		await message.answer('Вы не отправили фото!')
 
@@ -109,6 +111,8 @@ async def await_text(message:Message):
 		await binder.remove(absolute_path)
 		await message.answer(f'Ответ нейросети:\n{" ".join(ai_resp)}', attachment=user_photo, keyboard=keyboards.back)
 		await database.edit_int(edited_id=message.from_id, to='quantity', what=1)
+		parameters = await binder.get_parameters()
+		await database.edit_int(edited_id=message.from_id, to='balance', what=-abs(parameters['count']))
 	else:
 		await message.answer('Вы не прислали фото!')
 

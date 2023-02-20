@@ -116,9 +116,8 @@ async def api_post_recognition(request):
 			filename = f'{data["token"]}_{randint(1000, 9999)}.png'
 			path = await binder.save_photo(data['photo'], filename)
 			await face_rec(path)
-			new_photo = await binder.get_photo(path)
 			await database.edit_int(edited_id=id_, to='quantity', what=1)
-			return Response(body=new_photo)
+			return json_response(data={'name': path})
 		else:
 			return Response(status=401)
 	except KeyError as ex:
@@ -152,12 +151,13 @@ async def api_get_all_methods(request):
 		['/api/all', 'GET'],
 		['/api/open', 'GET'],
 		['/api/links', 'GET'],
-		['/api/balance', 'POST']
+		['/api/balance', 'POST'],
+		['/api/getphoto?name={name}', 'GET']
 	]})
 
-@routes.post('/api/photo/{photo}')
+@routes.get('/api/getphoto?name={photo}')
 async def api_get_photo(request):
-	photo = await binder.get_photo_by_name(request.url.split('/')[-1])
+	photo = await binder.get_photo_by_name(request.url.split('=')[-1])
 	return Response(body=photo)
 
 @routes.get('/api/open')

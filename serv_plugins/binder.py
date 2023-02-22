@@ -16,8 +16,7 @@ class Binder:
 			print('Cache path is create')
 		if not isdir(self.html_file):
 			mkdir(self.html_file)
-			with open(join(self.html_file, 'index.html'), 'w', encoding='utf-8') as file:
-				file.write('<!DOCTYPE html>')
+			self.downoload.write(join(self.html_file, 'index.html'), '<!DOCTYPE html>')
 		if not exists(join(self.cache_path, 'parameters.json')):
 			self.downoload.write('parameters.json', '''{
 	"admin": [],
@@ -34,8 +33,7 @@ class Binder:
 			return True
 
 	async def get_config(self) -> dict:
-		async with aiopen(self.config_file, 'r', encoding='utf-8') as file:
-			lines = await file.read()
+		lines = self.downoload.read(self.config_file)
 		return eval(f'{lines}')
 
 	async def save_photo(self, content:bytes, name:str) -> bool:
@@ -60,8 +58,7 @@ class Binder:
 	
 	async def get_page(self, route_page:str) -> str:
 		try:
-			async with aiopen(join(self.html_file, route_page), 'r', encoding='utf-8') as html:
-				file_reads = await html.read()
+			file_reads = self.downoload.read(join(self.html_file, route_page))
 		except:
 			file_reads = 'false'
 		finally:
@@ -72,8 +69,7 @@ class Binder:
 			return await photo.read()
 
 	async def get_open_source(self) -> str:
-		async with aiopen('server.py', 'r', encoding='utf-8') as py:
-			return await py.read()
+		return self.downoload.read('server.py')
 
 	async def get_photo_by_name(self, filename:str) -> bytes:
 		async with aiopen(join(self.cache_path, filename), 'rb') as file: byte = await file.read()
@@ -81,9 +77,7 @@ class Binder:
 		return byte
 	
 	async def get_parameters(self) -> dict:
-		async with aiopen(join(self.cache_path, 'parameters.json'), 'r', encoding='utf-8') as parameters:
-			lines = await parameters.read()
-		return loads(lines)
+		return loads(self.downoload.read('parameters.json'))
 
 	async def edit_parameters(self, new_parameters:dict) -> None:
 		self.downoload.write('parameters.json', f'{dumps(new_parameters)}')

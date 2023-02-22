@@ -2,14 +2,17 @@
 # include <fstream>
 using namespace std;
 
-string concatinate(string first, string second) { return first + second; }
+string concatinate(string first, string second) { 
+	string endline = "\n";
+	return first + endline +second;
+}
 
-string read(char* filename) {
+string read(string filename) {
+	ifstream file(filename.c_str());
 	string line, lines = "";
-	ifstream file;
-	file.open(filename);
+
 	if (file.is_open()) {
-		while (file >> line) {
+		while (getline(file, line)) {
 			lines = concatinate(lines, line);
 		}
 	} else {

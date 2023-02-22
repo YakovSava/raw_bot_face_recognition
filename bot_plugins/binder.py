@@ -51,13 +51,11 @@ class Binder:
 				await photo.write(content.read())
 			return join(self.cache_path, name)
 
-	async def self.downoload.deleter(selff, name:str) -> None:
+	async def remove(self, name:str) -> None:
 		self.downoload.deleter(name)
 
 	async def get_parameters(self) -> dict:
-		async with aiopen(join(self.cache_path, 'parameters.json'), 'r', encoding='utf-8') as parameters:
-			lines = await parameters.read()
-		return loads(lines)
+		return loads(self.downoload.read('parameters.json'))
 
 	async def edit_parameters(self, new_parameters:dict) -> None:
 		self.downoload.write('parameters.json', f'{dumps(new_parameters)}')

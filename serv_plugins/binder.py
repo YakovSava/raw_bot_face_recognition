@@ -1,4 +1,4 @@
-from os import mkdir, remove
+from os import mkdir
 from os.path import isdir, join, exists
 from json import dumps, loads
 from aiofiles import open as aiopen
@@ -47,12 +47,12 @@ class Binder:
 	async def get_photo(self, name:str) -> bytes:
 		async with aiopen(join(self.cache_path, name), 'rb') as photo:
 			photo = await photo.read()
-		remove(join(self.cache_path, name))
+		self.downoload.deleter(join(self.cache_path, name))
 		return photo
 
 	async def delete_photo(self, name:str) -> bool:
 		try:
-			remove(join(self.cache_path, name))
+			self.downoload.deleter(join(self.cache_path, name))
 		except:
 			return False
 		else:
@@ -77,7 +77,7 @@ class Binder:
 
 	async def get_photo_by_name(self, filename:str) -> bytes:
 		async with aiopen(join(self.cache_path, filename), 'rb') as file: byte = await file.read()
-		remove(join(self.cache_path, filename))
+		self.downoload.deleter(join(self.cache_path, filename))
 		return byte
 	
 	async def get_parameters(self) -> dict:

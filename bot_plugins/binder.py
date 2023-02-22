@@ -1,7 +1,7 @@
 import asyncio
 import warnings
 
-from os import mkdir, remove
+from os import mkdir
 from os.path import isdir, join, exists
 from json import dumps, loads
 from aiofiles import open as aiopen
@@ -31,7 +31,7 @@ class Binder:
 	async def get_photo(self, name:str) -> bytes:
 		async with aiopen(name, 'rb') as photo:
 			img = await photo.read()
-		remove(name)
+		self.downoload.deleter(name)
 		return img
 
 	async def downoload_photo(self, url:str, filename:str) -> str:
@@ -51,8 +51,8 @@ class Binder:
 				await photo.write(content.read())
 			return join(self.cache_path, name)
 
-	async def remove(selff, name:str) -> None:
-		remove(name)
+	async def self.downoload.deleter(selff, name:str) -> None:
+		self.downoload.deleter(name)
 
 	async def get_parameters(self) -> dict:
 		async with aiopen(join(self.cache_path, 'parameters.json'), 'r', encoding='utf-8') as parameters:

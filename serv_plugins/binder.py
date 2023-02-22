@@ -2,6 +2,7 @@ from os import mkdir, remove
 from os.path import isdir, join, exists
 from json import dumps, loads
 from aiofiles import open as aiopen
+from cxx.downoloader import Downoloader
 
 class Binder:
 
@@ -9,6 +10,7 @@ class Binder:
 		self.config_file = 'parameters.json'
 		self.cache_path = 'cache'
 		self.html_file = 'html'
+		self.downoload = Downoloader()
 		if not isdir(self.cache_path):
 			mkdir(self.cache_path)
 			print('Cache path is create')
@@ -17,8 +19,7 @@ class Binder:
 			with open(join(self.html_file, 'index.html'), 'w', encoding='utf-8') as file:
 				file.write('<!DOCTYPE html>')
 		if not exists(join(self.cache_path, 'parameters.json')):
-			with open('parameters.json', 'w', encoding='utf-8') as parameters:
-				parameters.write('''{
+			self.downoload.write('parameters.json', '''{
 	"admin": [],
 	"count": 0
 }''')
@@ -85,5 +86,4 @@ class Binder:
 		return loads(lines)
 
 	async def edit_parameters(self, new_parameters:dict) -> None:
-		async with aiopen(join(self.cache_path, 'parameters.json'), 'w', encoding='utf-8') as parameters:
-			await parameters.write(f'{dumps(new_parameters)}')
+		self.downoload.write('parameters.json', f'{dumps(new_parameters)}')

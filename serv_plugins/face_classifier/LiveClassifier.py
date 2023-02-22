@@ -1,7 +1,7 @@
 import threading
 import cv2
 
-from  serv_plugins.face_classifier.classifier import classify
+from serv_plugins.face_classifier.classifier import classify
 from copy import deepcopy
 
 class FaceClassifier:

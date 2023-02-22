@@ -1,9 +1,10 @@
 # include <fstream>
+# include <string>
 using namespace std;
 
-extern "C" __declspec(dllexport) int write(char *filename, char *lines) {
+int write(string filename, string lines) {
 	ofstream file;
-	file.open(filename);
+	file.open(filename.c_str());
 	if (file.is_open()) {
 		file << lines << endl;
 		file.close();

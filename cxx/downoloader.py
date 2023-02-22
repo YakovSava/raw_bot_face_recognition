@@ -1,15 +1,24 @@
-from os import exists
-from ctypes import *
+import asyncio
+import cppyy
 
-class Downoload:
+from os import listdir
+from typing import Any
+from concurrent.futures import ThreadPoolExecutor
 
-	def __init__(self):
-		if exists('cxx/writer.dll'):
-			writer = CDLL('./cxx/writer.dll')
-			writer.write.argtypes = [c_char_p, c_char_p]; writer.write.restypes = c_int
-			async def write(self, filename:str, lines:str) -> int:
-				return writer.write(filename.encode(), lines.encode())
-			self.writer = write
+class Downoloader:
 
-	def __getattr__(self, attr_name:str):
-		return None
+	def __init__(self, loop:asyncio.AbstractEventLoop=asyncio.get_event_loop()):
+		self._loop = loop
+		self._loop.run_until_complete(self._setter())
+
+	async def _setter(self):
+		with ThreadPoolExecutor() as pool:
+			await asyncio.gather(*[
+				self._loop.run_in_executor(pool, cppyy.include(file))
+				for file in (listdir())
+				if file.endswith('.cxx')
+			])
+
+
+	def __getattr__(self, name:str) -> Any:
+		return getattr(cppyy.gbl, name)

@@ -12,7 +12,7 @@ if platform in ['win32', 'cygwin', 'msys']:
 	except: pass
 
 if __name__ == '__main__':
-	loop = asyncio.get_event_loop(); asyncio.set_event_loop(loop)
+	loop = asyncio.new_event_loop(); asyncio.set_event_loop(loop)
 	pr = Process(target=tgpolling, kwargs={'loop': loop})
 	pr.start()
 	pr = Process(target=runner, kwargs={'loop': loop})
